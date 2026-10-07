@@ -1,6 +1,13 @@
 module
 
 public import ImprovedExponents.MinPlus.Comparison
+public import Mathlib.Data.Finset.Lattice.Fold
+public import Mathlib.Data.Finset.Prod
+public import Mathlib.Data.Fintype.Basic
+public import Mathlib.Data.Nat.Log
+public import Mathlib.Tactic.Linarith.Frontend
+public import Mathlib.Tactic.NormNum
+public import Mathlib.Tactic.Ring.RingNF
 
 @[expose] public section
 

@@ -1,6 +1,7 @@
 module
 
-public import Mathlib.Tactic
+public import Mathlib.Algebra.CharP.Defs
+public import Mathlib.Tactic.NormNum.Ineq
 
 @[expose] public section
 

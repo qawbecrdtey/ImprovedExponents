@@ -1,8 +1,6 @@
 module
 
 public import Mathlib.Analysis.SpecialFunctions.Log.NegMulLog
-public import Mathlib.Analysis.Calculus.Deriv.MeanValue
-public import Mathlib.Analysis.SpecialFunctions.Pow.Real
 
 @[expose] public section
 
