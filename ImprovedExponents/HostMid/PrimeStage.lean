@@ -47,7 +47,7 @@ theorem et17Sizes_spec' {P₀ R : Program} {ν : Et17Nums} {Tn : List ℕ → �
   have hmidWord : ((midSize D g : ℕ) : ℤ) ≤ lim.word :=
     le_word_of_le_hostWord hok0 ((midSize_le D g).trans (by unfold hostWord; omega))
   unfold et17Sizes' et17LocA
-  rw [if_neg (not_smallCase_iff.2 hbig)]
+  rw [ite_eq_right (not_smallCase_iff.2 hbig)]
   -- ThePrime := pChoose(Size, Bound, AdrAB, AdrBC, AdrAC, ParD, Free)
   light_call (choosePrime_meets C.hChoose C.ch (choosePre_of_ok hpre hok0)) with _ μ₁ ⟨rfl, hμ₁⟩
   -- Cap := pCap(Size, ParD)

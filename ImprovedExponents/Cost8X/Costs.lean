@@ -109,7 +109,7 @@ theorem exists_tPre31_leX (G : RatParams) {C : ℝ} (hC : 0 ≤ C) (c0 : ℕ) : 
     hA D₀ _ tp _ h.one_le_pre h.pre_le (fun hm => ?_) fun hm => ?_⟩
   · have hsmall : tPre31 c0 G N D₀ ≤ 20 * G.m₀ + 50 := by
       unfold tPre31 tLog4
-      rw [if_pos hm]
+      rw [ite_eq_left hm]
       omega
     exact_mod_cast hsmall
   · have := hK N D₀ h.one_le_N hm (h.hyp hm)

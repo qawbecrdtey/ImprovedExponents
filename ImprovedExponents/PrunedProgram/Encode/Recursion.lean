@@ -295,10 +295,10 @@ theorem TermsDoneP.step (lay : EncodeLayout lim src out scr tab p7 p10 (L + 1)) 
       have hbud : (P0Levels (Fin.tail τ)).card ≤ j' := by
         by_cases h9 : lam = 9
         · have : τ 0 = .P0 := (termIdx_eq_nine_iff _).1 (heq.trans h9)
-          simp only [this, if_true, h9] at hcard hj'
+          simp only [this, ite_true, h9] at hcard hj'
           omega
         · have : τ 0 ≠ .P0 := fun h => h9 (heq.symm.trans ((termIdx_eq_nine_iff _).2 h))
-          simp only [this, if_false, h9] at hcard hj'
+          simp only [this, ite_false, h9] at hcard hj'
           omega
       rw [hcodeT, heq, ← Nat.add_assoc, hnew _ hbud, encIdx_succ' c a L lam htail]
   · simp only [pow_succ', scrSize]

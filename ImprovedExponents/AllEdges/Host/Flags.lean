@@ -76,12 +76,13 @@ variable {acc hit idx}
 /-- A cell of a list other than the one that is set. -/
 theorem getD_set_ne (F : List ℤ) {j q : ℕ} (hne : j ≠ q) (x : ℤ) :
     (F.set j x).getD q 0 = F.getD q 0 := by
-  rw [List.getD_eq_getElem?_getD, List.getD_eq_getElem?_getD, List.getElem?_set, if_neg hne]
+  rw [List.getD_eq_getElem?_getD, List.getD_eq_getElem?_getD, List.getElem?_set, ite_eq_right hne]
 
 /-- The cell of a list that is set. -/
 theorem getD_set_self (F : List ℤ) {j : ℕ} (hj : j < F.length) (x : ℤ) :
     (F.set j x).getD j 0 = x := by
-  rw [List.getD_eq_getElem?_getD, List.getElem?_set, if_pos rfl, if_pos hj, Option.getD_some]
+  rw [List.getD_eq_getElem?_getD, List.getElem?_set, ite_eq_left rfl, ite_eq_left hj,
+    Option.getD_some]
 
 /-- The bit of a proposition is 0 if and only if the proposition fails. -/
 theorem bit_decide_eq_zero (P : Prop) [Decidable P] : bit (decide P) = 0 ↔ ¬P := by
@@ -122,16 +123,16 @@ theorem aeStep_getD {F : List ℤ} {q : ℕ} (hq : q < F.length) (i : ℕ) :
       have hlen : q < (aeStep acc hit idx F i).length := by rwa [length_aeStep]
       split_ifs with h0 hF hF
       · -- it is scanned: its flag was 0, so no earlier pair in the cell hit
-        rw [ih, if_pos hF, bit_decide_eq_zero] at h0
+        rw [ih, ite_eq_left hF, bit_decide_eq_zero] at h0
         rw [getD_set_self _ hlen]
         congr 1
         rw [Bool.eq_iff_iff, decide_eq_true_eq, hex]
         simp [h0.1, h0.2, hpq]
-      · rw [ih, if_neg hF] at h0
+      · rw [ih, ite_eq_right hF] at h0
         exact absurd h0.2 hF
       · -- it is not scanned: not accepted, or an earlier pair in the cell hit
-        rw [ih, if_pos hF, bit_decide_eq_zero] at h0
-        rw [ih, if_pos hF]
+        rw [ih, ite_eq_left hF, bit_decide_eq_zero] at h0
+        rw [ih, ite_eq_left hF]
         congr 1
         rw [decide_eq_decide, hex]
         constructor
@@ -140,7 +141,7 @@ theorem aeStep_getD {F : List ℤ} {q : ℕ} (hq : q < F.length) (i : ℕ) :
           · exact h
           · by_contra hn
             exact h0 ⟨hacc, hn⟩
-      · rw [ih, if_neg hF]
+      · rw [ih, ite_eq_right hF]
     · -- the pair `i` lies in another cell
       have hex' : (∃ j < i + 1, idx j = q ∧ acc j = true ∧ hit j = true) ↔
           (∃ j < i, idx j = q ∧ acc j = true ∧ hit j = true) := by
@@ -152,9 +153,9 @@ theorem aeStep_getD {F : List ℤ} {q : ℕ} (hq : q < F.length) (i : ℕ) :
         rw [ih]
         simp only [hex']
       by_cases h0 : acc i = true ∧ (aeStep acc hit idx F i).getD (idx i) 0 = 0
-      · rw [if_pos h0, getD_set_ne _ hpq]
+      · rw [ite_eq_left h0, getD_set_ne _ hpq]
         exact key
-      · rw [if_neg h0]
+      · rw [ite_eq_right h0]
         exact key
 
 /-- The number of flags that are not 0 is at most the number of flags. -/
@@ -171,15 +172,15 @@ theorem aeExec_add_ones_le (F : List ℤ) {i : ℕ} (hidx : idx i < F.length) :
     have hex : aeExec acc hit idx F i = true := by
       rw [aeExec, Bool.and_eq_true, decide_eq_true_eq]
       exact h0
-    rw [if_pos h0, if_pos hex, ones, ones, List.countP_set hidx', ← List.getD_eq_getElem _ 0 hidx',
-      h0.2]
+    rw [ite_eq_left h0, ite_eq_left hex, ones, ones, List.countP_set hidx',
+      ← List.getD_eq_getElem _ 0 hidx', h0.2]
     rcases hhit : hit i
     · -- it fails
       simp [h0.1, bit]
     · -- it hits: one more flag is 1
-      rw [h0.1, bit, if_pos rfl]
-      simp only [Bool.not_true, Bool.and_false, Bool.false_eq_true, if_false, zero_add, ne_eq,
-        one_ne_zero, not_false_eq_true, not_true_eq_false, decide_true, decide_false, if_true,
+      rw [h0.1, bit, ite_eq_left rfl]
+      simp only [Bool.not_true, Bool.and_false, Bool.false_eq_true, ite_false, zero_add, ne_eq,
+        one_ne_zero, not_false_eq_true, not_true_eq_false, decide_true, decide_false, ite_true,
         Nat.sub_zero]
       omega
   · -- no scan: the pair is not accepted or its flag is not 0
@@ -188,8 +189,8 @@ theorem aeExec_add_ones_le (F : List ℤ) {i : ℕ} (hidx : idx i < F.length) :
       · rfl
       · rw [aeExec, Bool.and_eq_true, decide_eq_true_eq] at h
         exact absurd h h0
-    rw [if_neg h0]
-    simp only [hex, Bool.false_eq_true, if_false, zero_add]
+    rw [ite_eq_right h0]
+    simp only [hex, Bool.false_eq_true, ite_false, zero_add]
     exact Nat.le_add_left _ _
 
 /-- **Each scan fails or raises the number of flags that are 1**: through `w` query pairs whose

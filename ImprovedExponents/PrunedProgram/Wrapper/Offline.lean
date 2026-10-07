@@ -119,7 +119,7 @@ theorem offlineAsk32P_ends (hq : QuerySpec31P lim P G) {aI aJ out d : ℕ}
       (fun a h1 h2 => Function.update_of_ne (by rcases hin.out_matX with h | h <;> omega) _ _)
       (fun a h1 h2 => Function.update_of_ne (by rcases hin.out_matY with h | h <;> omega) _ _)
       fun a ha => Function.update_of_ne (by omega) _ _)
-  rw [List.getElem_map, List.getElem_zip, entryN, dif_pos ⟨hIN, hJN⟩] at hstep
+  rw [List.getElem_map, List.getElem_zip, entryN, dite_eq_left ⟨hIN, hJN⟩] at hstep
   exact ⟨_, _, rfl, hstep⟩
 
 /-- offline32P meets its specification if the pruned preprocessing and the query meet theirs. -/

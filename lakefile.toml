@@ -10,12 +10,48 @@ weak.linter.mathlibStandardSet = true
 weak.linter.style.header = false # no copyright headers in this project
 maxSynthPendingDepth = 3
 
-# The formalization of the paper (Alman, Vassilevska Williams) that this project builds on.
 [[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4"
+rev = "v4.35.0-rc2"
+
+# The formalization of the paper (Alman, Vassilevska Williams) that this project builds on: the part
+# of anthropics/formal-math, directory 3sum-apsp, commit e1a4e6508154ea59f030480661590a9fe3018011,
+# that this project uses, ported to Lean v4.35.0-rc2 (Copyright (c) 2026 Anthropic, PBC, Apache
+# License 2.0; see upstream/README.md and NOTICE). Its three libraries are upstream's and keep
+# upstream's options: the linters and `maxSynthPendingDepth` set above for this project are reset.
+# The warnings on deprecated names, syntax and modules are off, so that the port changes only what no
+# longer compiles (`weak.linter.deprecated` because TOML cannot also nest `linter.deprecated.module` in it).
+[[lean_lib]]
+name = "EndStatement"
+srcDir = "upstream/3sum-apsp"
+[lean_lib.leanOptions]
+maxSynthPendingDepth = 1
+linter.deprecated.module = false
+linter.deprecated.syntax = false
+weak.linter.deprecated = false
+weak.linter.mathlibStandardSet = false
+
+[[lean_lib]]
+name = "PaperStatements"
+srcDir = "upstream/3sum-apsp"
+[lean_lib.leanOptions]
+maxSynthPendingDepth = 1
+linter.deprecated.module = false
+linter.deprecated.syntax = false
+weak.linter.deprecated = false
+weak.linter.mathlibStandardSet = false
+
+[[lean_lib]]
 name = "ThreeSumApsp"
-git = "https://github.com/anthropics/formal-math"
-rev = "e1a4e6508154ea59f030480661590a9fe3018011"
-subDir = "3sum-apsp"
+srcDir = "upstream/3sum-apsp"
+globs = ["ThreeSumApsp.+"]
+[lean_lib.leanOptions]
+maxSynthPendingDepth = 1
+linter.deprecated.module = false
+linter.deprecated.syntax = false
+weak.linter.deprecated = false
+weak.linter.mathlibStandardSet = false
 
 # The proofs.
 [[lean_lib]]

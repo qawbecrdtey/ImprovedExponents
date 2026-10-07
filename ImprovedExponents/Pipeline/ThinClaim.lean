@@ -512,14 +512,14 @@ theorem allInstances_solves {P : Program} {R : RegimeTest} {O : OfflineRoutine} 
       rcases hr with ⟨-, h⟩ | ⟨rfl, -⟩
       · exact h
       · simp at hpos
-    rw [if_pos hreg]
+    rw [ite_eq_left hreg]
     exact Ends.callTo (O.meets (O.aux_append P Q hauxO) (getElem?_append_of_eq_some hoff Q) hpre
       (hfit _ _ hreg) okO) fun _ _ h => h
   · have hreg : ¬ R.Reg x.N x.D := by
       rcases hr with ⟨rfl, -⟩ | ⟨-, h⟩
       · simp at hneg
       · exact h
-    rw [if_neg hreg]
+    rw [ite_eq_right hreg]
     have hbrute : Meets lim (P ++ Q) Sec2.pThinBrute (d + 1)
         [x.N, x.D, x.w, x.U, x.x, x.y, x.wi, x.wj, x.out, fr] μ (40 * ((x.w + 1) * (x.D + 1)))
         fun r μ' => thinTask.Post x μ fr r μ' :=
@@ -693,7 +693,7 @@ theorem thinClaimR_of_offlineWithin {P : Program} {R : RegimeTest} {O : OfflineR
     exact_mod_cast allInstancesTimeR_mono R O N D₀ U 0 hw
   · have htime : (allInstancesTimeR R O [N, D₀, w, 0] : ℝ)
         = (O.time N D₀ w : ℝ) + 400 + ((R.time + 64 : ℕ) : ℝ) - 400 := by
-      simp only [allInstancesTimeR, if_pos (hreg N D₀ hN hD hDN)]
+      simp only [allInstancesTimeR, ite_eq_left (hreg N D₀ hN hD hDN)]
       push_cast
       ring
     change (allInstancesTimeR R O [N, D₀, w, 0] : ℝ) ≤ _

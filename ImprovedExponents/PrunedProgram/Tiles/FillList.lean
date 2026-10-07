@@ -293,7 +293,7 @@ private theorem body_spec (K : Callees lim P) (H : FillListPreP lim μ x)
   -- while more = 1
   refine Ends.whileConst (InvP μ x) x.leaves.length (tFillRound x.L) ?start ?round ?done ?time
   case start =>
-    refine ⟨0, 0, 0, res, ν, by rw [if_pos hpos]; rfl, fun _ => hfirst ▸ hleaf, ?_,
+    refine ⟨0, 0, 0, res, ν, by rw [ite_eq_left hpos]; rfl, fun _ => hfirst ▸ hleaf, ?_,
       H.segA.keep, H.segB.keep, by light_keep⟩
     rw [FillListArgs.trieAt, fillAt_zero]
     exact H.trie.keep

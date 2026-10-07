@@ -2,6 +2,7 @@
 Copyright (c) 2026 Anthropic, PBC. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 SPDX-License-Identifier: Apache-2.0
+Modified in 2026 for ImprovedExponents (Jihoon Hyun): ported to Lean and Mathlib v4.35.0-rc2.
 -/
 module
 
@@ -45,7 +46,7 @@ theorem abs_sum_mul_le [Ring R] [LinearOrder R] [IsOrderedRing R] (s : Finset ι
 /-- If `|f i| ≤ 1` for all `i ∈ s`, then `|∏ i ∈ s, f i| ≤ 1`. -/
 theorem abs_prod_le_one [CommRing R] [LinearOrder R] [IsStrictOrderedRing R] (s : Finset ι)
     {f : ι → R} (h : ∀ i ∈ s, |f i| ≤ 1) : |∏ i ∈ s, f i| ≤ 1 :=
-  (abs_prod s f).trans_le (prod_le_one (fun _ _ => abs_nonneg _) h)
+  (abs_prod s f).trans_le (prod_le_one₀ (fun _ _ => abs_nonneg _) h)
 
 /-- A sum over the indices below `m * n`, row by row: the index `a * n + b` has row `a` and column
 `b`. -/

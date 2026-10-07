@@ -1,6 +1,7 @@
 module
 
-public import ThreeSumApsp
+public import ThreeSumApsp.RunningTimes.Sec3.Theorem22
+public import ThreeSumApsp.Statements.Exponents
 
 @[expose] public section
 
@@ -9,7 +10,9 @@ public import ThreeSumApsp
 
 This project builds on the Lean formalization of Alman and Vassilevska Williams, *Truly Subquadratic
 3SUM and Truly Subcubic APSP via Triangles in Sparse Lopsided Graphs* (arXiv 2610.06783), published
-as `anthropics/formal-math/3sum-apsp`. This file only checks that the dependency is in place.
+as `anthropics/formal-math/3sum-apsp`; the part of it that this project uses is included in
+`upstream/3sum-apsp/` and ported to Lean `v4.35.0-rc2` (`upstream/README.md`). This file only checks
+that it is in place.
 -/
 
 namespace ImprovedExponents

@@ -189,7 +189,7 @@ theorem scanPairsAEStep_spec (hp : P[pScan]? = some scanBody)
     light_store (flg + (a * n + b) : ℕ) (bit (scanHit n AB BC AC a b c0 len)) using hz, hcell0,
       tScanCallAE
     refine ⟨(flg + (a * n + b) : ℕ), bit (scanHit n AB BC AC a b c0 len), ?_⟩
-    rw [if_pos ⟨decide_eq_true hz, hcell0⟩]
+    rw [ite_eq_left ⟨decide_eq_true hz, hcell0⟩]
     congr 1
     funext y
     by_cases hy : y = flg + (a * n + b)

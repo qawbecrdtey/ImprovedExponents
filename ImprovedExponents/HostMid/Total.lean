@@ -37,9 +37,9 @@ theorem obeysBound17Mid_hostTime (D g : ℕ → ℕ) {Dfun Gfun tD tG : ℕ → 
     intro m d w w' hm _ hw
     change ((Tn [m, midSize d (Gfun d), w] : ℕ) : ℝ) ≤ T' m d w'
     by_cases hmid : 1 ≤ midSize d (Gfun d)
-    · simp only [T', if_pos hmid]
+    · simp only [T', ite_eq_left hmid]
       exact hT m _ w w' hm hmid hw
-    · simp only [T', if_neg hmid]
+    · simp only [T', ite_eq_right hmid]
       exact_mod_cast Finset.le_sup (f := fun v => Tn [m, midSize d (Gfun d), v])
         (Finset.mem_range.2 (by omega))
   have hn1 : 1 ≤ n := by omega
@@ -47,6 +47,6 @@ theorem obeysBound17Mid_hostTime (D g : ℕ → ℕ) {Dfun Gfun tD tG : ℕ → 
   have h := hbound (fun ps => Tn (midArgs Gfun ps)) T' hT' n U κ h16 hDn hg1 hg hκ hU
   rw [hostTime'_eq]
   refine h.trans (le_of_eq ?_)
-  simp only [bound17, bound17Mid, T', hGf n hn1, if_pos hmid]
+  simp only [bound17, bound17Mid, T', hGf n hn1, ite_eq_left hmid]
 
 end ImprovedExponents.HostMid

@@ -41,10 +41,10 @@ theorem et17_spec' {P₀ R : Program} {ν : Et17Nums} {Tn : List ℕ → ℕ} {n
   rintro _ rfl
   -- if n is small: the brute force
   by_cases hs : SmallCase x.n D g
-  · rw [if_pos hs]
+  · rw [ite_eq_left hs]
     exact Ends.iteLast (fun _ => (et17Small_spec' C x μ fr D g _ _ hpre hok).mono
       (by simp; omega) fun _ h => h) (fun h => absurd (by simp [et17LocA, hs]) h) (by simp; omega)
-  rw [if_neg hs]
+  rw [ite_eq_right hs]
   refine Ends.iteLast (fun h => absurd h (by simp [et17LocA, hs])) (fun _ => ?_) (by simp; omega)
   -- otherwise: the sizes, then the tables and the loop over the instances
   have hbig := not_smallCase_iff.1 hs

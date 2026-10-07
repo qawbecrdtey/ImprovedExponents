@@ -196,7 +196,7 @@ theorem pre31P_meets {c : ℕ} (G : RatParams) (hP : P[Proc.pre31P]? = some (pre
     refine Ends.next (tPrePad31 G N D₀) ((prePad31_endsP C h hm hd).mono le_rfl fun σ hσ =>
       (preBuild31P_ends C h hm hd hσ).mono ?_ fun _ hQ => hQ) ?_
     all_goals
-      simp only [tPre31P, tPrePad31, if_neg (not_lt.mpr hm)]
+      simp only [tPre31P, tPrePad31, ite_eq_right (not_lt.mpr hm)]
       simp [logFour]
       omega
 

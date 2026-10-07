@@ -2,6 +2,7 @@
 Copyright (c) 2026 Anthropic, PBC. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 SPDX-License-Identifier: Apache-2.0
+Modified in 2026 for ImprovedExponents (Jihoon Hyun): ported to Lean and Mathlib v4.35.0-rc2.
 -/
 module
 
@@ -110,8 +111,6 @@ theorem sum_card_wantedStrings_le {L m N : ℕ} (lay : Layout L m) (W : Finset (
   refine sum_le_sum fun T _ => ?_
   refine card_image_le.trans (le_of_eq ?_)
   congr 1
-  refine filter_congr fun IJ _ => ?_
-  exact (Prod.ext_iff (x := (bandOf L m IJ.1, bandOf L m IJ.2)) (y := T)).symm
 
 /-- Section 2.4.4: "there are at most 4N²/M tiles, so ∑_T M ≤ 4N²", where `N` is the padded size. -/
 theorem sum_M_le (L m N : ℕ) : ∑ _T ∈ tiles L m N, M L m ≤ 4 * padN L m N ^ 2 := by

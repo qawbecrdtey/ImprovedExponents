@@ -86,7 +86,7 @@ theorem tPre31P_add_tPreCore (c0 : ℕ) (N D₀ : ℕ) (hm : G.m₀ ≤ logFour 
     tPre31P c0 G N D₀ + tPreCore c0 (parOf G N D₀) (switchOf31 G D₀)
       = tPre31 c0 G N D₀ + tPreCoreP c0 (parOf G N D₀) (switchOf31 G D₀) := by
   unfold tPre31P tPre31
-  rw [if_neg (not_lt.2 hm), if_neg (not_lt.2 hm)]
+  rw [ite_eq_right (not_lt.2 hm), ite_eq_right (not_lt.2 hm)]
   ring
 
 /-- Setting up takes `O(L + N 4^m)` steps: upstream's `exists_tPre31_le_setup` for the pruned
@@ -140,7 +140,7 @@ theorem exists_tPre31P_le (G : RatParams) {C : ℝ} (hC : 0 ≤ C) (c0 : ℕ) : 
     hA D₀ _ tp _ h.one_le_pre h.pre_le (fun hm => ?_) fun hm => ?_⟩
   · have hsmall : tPre31P c0 G N D₀ ≤ 20 * G.m₀ + 50 := by
       unfold tPre31P tLog4
-      rw [if_pos hm]
+      rw [ite_eq_left hm]
       omega
     exact_mod_cast hsmall
   · have := hK N D₀ h.one_le_N hm (h.hyp hm)

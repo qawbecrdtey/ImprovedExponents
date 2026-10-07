@@ -2,6 +2,7 @@
 Copyright (c) 2026 Anthropic, PBC. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 SPDX-License-Identifier: Apache-2.0
+Modified in 2026 for ImprovedExponents (Jihoon Hyun): ported to Lean and Mathlib v4.35.0-rc2.
 -/
 module
 
@@ -100,7 +101,7 @@ variable {s} {x : α} {e e' : ι → ℕ} {c c' : ℕ}
 
 /-- All bases are at least 1, so a monomial grows with its exponents. -/
 theorem mon_le_mon (he : ∀ i, e i ≤ e' i) (hx : s.dom x) : s.mon e x ≤ s.mon e' x :=
-  Finset.prod_le_prod (fun i _ => pow_nonneg (zero_le_one.trans (s.one_le_base i x hx)) _)
+  Finset.prod_le_prod₀ (fun i _ => pow_nonneg (zero_le_one.trans (s.one_le_base i x hx)) _)
     fun i _ => pow_le_pow_right₀ (s.one_le_base i x hx) (he i)
 
 /-- A monomial is at least 1. -/
@@ -253,7 +254,7 @@ theorem log2 (hs : ∀ i x, s.dom x → s.base i x ≤ 2 ^ s.hidden x) (h : s.So
       _ ≤ 2 ^ K * ((2 ^ s.hidden x) ^ c * ∏ i, (2 ^ s.hidden x) ^ e i) := by
           have hmon := zero_le_one.trans (one_le_mon e hx)
           gcongr
-          exact Finset.prod_le_prod (fun i _ => pow_nonneg (hbase i) _)
+          exact Finset.prod_le_prod₀ (fun i _ => pow_nonneg (hbase i) _)
             fun i _ => pow_le_pow_left₀ (hbase i) (hs i x hx) _
       _ ≤ (2 ^ s.hidden x) ^ K * ((2 ^ s.hidden x) ^ c * ∏ i, (2 ^ s.hidden x) ^ e i) := by
           gcongr

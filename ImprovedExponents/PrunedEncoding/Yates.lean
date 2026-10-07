@@ -115,10 +115,10 @@ theorem sum_mul_mixPhi_update {L : ℕ} (a : LeftStr L → ℤ) (s : MixStr L) (
   rw [sum_comm]
   refine sum_congr rfl fun u _ => ?_
   rw [sum_eq_single (u ℓ₀)]
-  · rw [if_pos rfl]
+  · rw [ite_eq_left rfl]
     ring
   · intro v _ hv
-    rw [if_neg (Ne.symm hv)]
+    rw [ite_eq_right (Ne.symm hv)]
     ring
   · intro h
     exact absurd (mem_univ _) h
@@ -164,7 +164,7 @@ theorem mixPhi_inr {L : ℕ} (a : LeftStr L → ℤ) (u : LeftStr L) :
 /-- `A_0[u] = a[u]`. -/
 theorem yatesInit_inr {L : ℕ} (a : LeftStr L → ℤ) (u : LeftStr L) :
     yatesInit a (Sum.inr ∘ u) = a u :=
-  if_pos fun _ => ⟨fun h => absurd h (Nat.not_lt_zero _), fun _ => rfl⟩
+  ite_eq_left fun _ => ⟨fun h => absurd h (Nat.not_lt_zero _), fun _ => rfl⟩
 
 /-- The mixed strings of the shape of stage `0` are the strings of left variables. -/
 theorem isStage_zero_iff {L : ℕ} (s : MixStr L) : IsStage 0 s ↔ s = Sum.inr ∘ rightPart s := by
@@ -180,7 +180,7 @@ theorem isStage_zero_iff {L : ℕ} (s : MixStr L) : IsStage 0 s ↔ s = Sum.inr 
 /-- `A_0` vanishes at the mixed strings that are not strings of left variables. -/
 theorem yatesInit_eq_zero {L : ℕ} (a : LeftStr L → ℤ) {s : MixStr L}
     (h : ∀ u : LeftStr L, s ≠ Sum.inr ∘ u) : yatesInit a s = 0 :=
-  if_neg fun h0 => h _ ((isStage_zero_iff s).mp h0)
+  ite_eq_right fun h0 => h _ ((isStage_zero_iff s).mp h0)
 
 /-- Replacing the term at level `k` of a string by a left variable turns the shape of stage `k + 1`
 into that of stage `k`. -/
@@ -212,29 +212,29 @@ theorem yatesStage_eq {L : ℕ} (a : LeftStr L → ℤ) (k : ℕ) (s : MixStr L)
   induction k generalizing s with
   | zero =>
     by_cases h : IsStage 0 s
-    · rw [if_pos h, mixPhi_of_isStage_zero a h]
-      exact if_pos h
-    · rw [if_neg h]
-      exact if_neg h
+    · rw [ite_eq_left h, mixPhi_of_isStage_zero a h]
+      exact ite_eq_left h
+    · rw [ite_eq_right h]
+      exact ite_eq_right h
   | succ k ih =>
     rw [yatesStage]
     by_cases hk : k < L
-    · rw [dif_pos hk]
+    · rw [dite_eq_left hk]
       cases hs : s ⟨k, hk⟩ with
       | inl τ =>
         rw [yatesStep_inl _ _ hs]
         simp only [ih, isStage_update_iff hk hs]
         by_cases h : IsStage (k + 1) s
-        · simp only [if_pos h]
+        · simp only [ite_eq_left h]
           exact sum_phi_mul_mixPhi_update a s _ hs
-        · simp [if_neg h]
+        · simp [ite_eq_right h]
       | inr v =>
-        rw [yatesStep_inr _ _ hs, if_neg]
+        rw [yatesStep_inr _ _ hs, ite_eq_right]
         intro h
         have hl := (h ⟨k, hk⟩).1 (Nat.lt_succ_self k)
         rw [hs] at hl
         simp at hl
-    · rw [dif_neg hk, ih]
+    · rw [dite_eq_right hk, ih]
       have hiff : IsStage k s ↔ IsStage (k + 1) s :=
         ⟨fun h ℓ => ⟨fun _ => (h ℓ).1 (by omega), fun h' => by omega⟩,
           fun h ℓ => ⟨fun _ => (h ℓ).1 (by omega), fun h' => by omega⟩⟩
@@ -244,14 +244,14 @@ theorem yatesStage_eq {L : ℕ} (a : LeftStr L → ℤ) (k : ℕ) (s : MixStr L)
 `τ` is the encoding `Φ_τ(a)`. -/
 theorem yatesStage_final {L : ℕ} (a : LeftStr L → ℤ) (τ : Leaf L) :
     yatesStage a L (Sum.inl ∘ τ) = Phi τ a := by
-  rw [yatesStage_eq, if_pos, mixPhi_inl]
+  rw [yatesStage_eq, ite_eq_left, mixPhi_inl]
   intro ℓ
   exact ⟨fun _ => rfl, fun h => by omega⟩
 
 /-- The array of stage `k` vanishes outside the strings of the shape of stage `k`. -/
 theorem yatesStage_eq_zero_of_not_isStage {L : ℕ} (a : LeftStr L → ℤ) {k : ℕ} {s : MixStr L}
     (h : ¬ IsStage k s) : yatesStage a k s = 0 := by
-  rw [yatesStage_eq, if_neg h]
+  rw [yatesStage_eq, ite_eq_right h]
 
 /-- If `a` vanishes off the left strings with exactly `m` inner variables, a partial encoding for
 a mixed string with more than `m` inner variables is `0`. -/
@@ -290,7 +290,7 @@ theorem yatesStage_succ {L : ℕ} (a : LeftStr L → ℤ) {k : ℕ} (hk : k < L)
     {τ : Term} (hs : s ⟨k, hk⟩ = .inl τ) :
     yatesStage a (k + 1) s
       = ∑ v, phi τ v * yatesStage a k (Function.update s ⟨k, hk⟩ (.inr v)) := by
-  rw [yatesStage, dif_pos hk, yatesStep_inl _ _ hs]
+  rw [yatesStage, dite_eq_left hk, yatesStep_inl _ _ hs]
 
 /-- Replacing a symbol of a mixed string by a left variable does not increase the number of
 symbols `P₀`. -/

@@ -187,15 +187,15 @@ private theorem tMem_succ {μ : ℕ → ℤ} {dst n : ℕ} {c : ℤ} {Y : List �
   funext a
   simp only [tMem, wrote, Nat.succ_mul]
   by_cases h1 : dst + j * n ≤ a ∧ a < dst + j * n + n
-  · rw [if_pos h1, if_pos (by omega)]
+  · rw [ite_eq_left h1, ite_eq_left (by omega)]
     obtain ⟨i, hi, rfl⟩ : ∃ i, i < n ∧ a = dst + (j * n + i) :=
       ⟨a - dst - j * n, by omega, by omega⟩
     rw [show dst + (j * n + i) - (dst + j * n) = i by omega, Nat.add_sub_cancel_left,
       transposeL_getD c Y hj hi]
-  · rw [if_neg h1]
+  · rw [ite_eq_right h1]
     by_cases h2 : dst ≤ a ∧ a < dst + j * n
-    · rw [if_pos h2, if_pos (by omega)]
-    · rw [if_neg h2, if_neg (by omega)]
+    · rw [ite_eq_left h2, ite_eq_left (by omega)]
+    · rw [ite_eq_right h2, ite_eq_right (by omega)]
 
 /-- **transpose** writes the transpose of the matrix at src, with c added to every entry, to the n²
 cells from dst, and changes nothing else. -/

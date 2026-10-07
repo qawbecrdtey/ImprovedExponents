@@ -75,14 +75,14 @@ theorem prunedStage_succ {L m : ℕ} (a : LeftStr L → ℤ) {k : ℕ} (hk : k <
     (hs : s ∈ stageSet L (k + 1) m) :
     prunedStage m a (k + 1) s = ∑ v ∈ coeffSupport (s ⟨k, hk⟩),
       mixCoeff (s ⟨k, hk⟩) v * prunedStage m a k (Function.update s ⟨k, hk⟩ (.inr v)) := by
-  rw [prunedStage, dif_pos hk, if_pos hs]
+  rw [prunedStage, dite_eq_left hk, ite_eq_left hs]
 
 /-- The pruned array of stage `k` vanishes outside `stageSet L k m`. -/
 theorem prunedStage_eq_zero {L m : ℕ} (a : LeftStr L → ℤ) {k : ℕ} (hk : k ≤ L) {s : MixStr L}
     (hs : s ∉ stageSet L k m) : prunedStage m a k s = 0 := by
   cases k with
-  | zero => rw [prunedStage, if_neg hs]
-  | succ k => rw [prunedStage, dif_pos (by omega), if_neg hs]
+  | zero => rw [prunedStage, ite_eq_right hs]
+  | succ k => rw [prunedStage, dite_eq_left (by omega), ite_eq_right hs]
 
 /-- The entries that the sum for an entry of stage `k + 1` reads: the string with a left variable
 `v` in place of the term at level `k` has the shape of stage `k` and at most `m` symbols `P₀`, so
@@ -118,15 +118,15 @@ theorem prunedStage_eq_yatesStage {L m : ℕ} {a : LeftStr L → ℤ}
   | zero =>
     rw [prunedStage]
     by_cases hs : s ∈ stageSet L 0 m
-    · rw [if_pos hs]
-      exact (if_pos (mem_filter.mp hs).2.1).symm
-    · rw [if_neg hs, yatesStage_eq_zero_of_notMem ha hp hs]
+    · rw [ite_eq_left hs]
+      exact (ite_eq_left (mem_filter.mp hs).2.1).symm
+    · rw [ite_eq_right hs, yatesStage_eq_zero_of_notMem ha hp hs]
   | succ k ih =>
     rw [prunedStage]
     by_cases hk : k < L
-    · rw [dif_pos hk]
+    · rw [dite_eq_left hk]
       by_cases hs : s ∈ stageSet L (k + 1) m
-      · rw [if_pos hs]
+      · rw [ite_eq_left hs]
         have hl := ((mem_filter.mp hs).2.1 ⟨k, hk⟩).1 (Nat.lt_succ_self k)
         obtain ⟨τ, hτ⟩ := Sum.isLeft_iff.mp hl
         rw [yatesStage_succ a hk hτ, hτ]
@@ -139,8 +139,8 @@ theorem prunedStage_eq_yatesStage {L m : ℕ} {a : LeftStr L → ℤ}
           apply hv
           change phi τ v * _ = 0
           rw [h0, zero_mul]
-      · rw [if_neg hs, yatesStage_eq_zero_of_notMem ha hp hs]
-    · rw [dif_neg hk, ih s hp, yatesStage, dif_neg hk]
+      · rw [ite_eq_right hs, yatesStage_eq_zero_of_notMem ha hp hs]
+    · rw [dite_eq_right hk, ih s hp, yatesStage, dite_eq_right hk]
 
 /-- **The pruned recursion computes the encodings**: its last array holds `Φ_τ(a)` at every leaf
 `τ` with at most `m` symbols `P₀`. -/

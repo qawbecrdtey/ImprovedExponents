@@ -263,10 +263,10 @@ theorem search_eq_minPlus_aux [NeZero n] (A B : Fin n → Fin n → ℤ) (W R : 
       have hiff := (hask i j).trans (exists_lt_iff_minPlus_lt A B i j _)
       unfold searchRound
       by_cases hc : q (fun i j => lo i j + 2 ^ r) i j = true
-      · rw [if_pos hc]
+      · rw [ite_eq_left hc]
         have := hiff.mp hc
         constructor <;> linarith
-      · rw [if_neg hc]
+      · rw [ite_eq_right hc]
         have hge : lo i j + 2 ^ r ≤ minPlus A B i j := not_lt.mp fun hlt => hc (hiff.mpr hlt)
         constructor <;> linarith
 

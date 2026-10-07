@@ -99,7 +99,7 @@ theorem query31P_meets (G : RatParams) (hP : P[Proc.query31]? = some query31Body
         (paddedYAt N D₀ fr) (blockAt N D₀ fr) _ _ U μ I J (G.t_le _) (hlim.large hlarge)
         (abs_padInnerCols_le hin.absX hU0) (abs_padInnerRows_le hin.absY hU0) hDS _ (by omega)) ?_
       (by light_side [haddr, hbase])
-      (hT := by simp [tQuery31, if_neg (not_lt.mpr hlarge), parOf]; omega)
+      (hT := by simp [tQuery31, ite_eq_right (not_lt.mpr hlarge), parOf]; omega)
     rintro r μ' ⟨hr, hDS', hout⟩
     have hscratch := G.scratch_in_block N D₀ fr
     have hb0 := add_three_le_blockAt N D₀ fr
@@ -115,7 +115,7 @@ theorem query31P_meets (G : RatParams) (hP : P[Proc.query31]? = some query31Body
       exact hflag (by simpa using (hR.large (by omega)).1)
     refine Ends.callTo (hip N D₀ aX aY X Y U μ I J hin.one_le_D hR.matX hR.matY hin.absX hin.absY
       (by omega) (by omega) hlim.ip _ (by omega)) ?_
-      (hT := by simp [tQuery31, if_pos hsmall]; omega)
+      (hT := by simp [tQuery31, ite_eq_left hsmall]; omega)
     rintro r μ' ⟨hr, rfl⟩
     exact ⟨hr, hR, .refl⟩
 

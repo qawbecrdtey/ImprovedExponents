@@ -93,7 +93,7 @@ theorem hostTimeAE_zero_le {Dfun Gfun : ℕ → ℕ} (tD tG : ℕ → ℕ) {n U 
   have h := hostLoopBoundAE_zero_le n U D g
   unfold hostTimeAE hostCoreTime hostTime' extraAE
   rw [hD, hG]
-  simp only [if_neg hs]
+  simp only [ite_eq_right hs]
   unfold hostMainAE hostMain'
   omega
 
@@ -107,7 +107,7 @@ theorem hostTimeAE_eq {Dfun Gfun : ℕ → ℕ} (tD tG : ℕ → ℕ) (Tn : List
         + hostTimeAE Dfun Gfun tD tG (fun _ => 0) n U := by
   unfold hostTimeAE hostCoreTime
   rw [hD, hG]
-  simp only [if_neg hs]
+  simp only [ite_eq_right hs]
   unfold hostMainAE hostLoopBoundAE
   rw [supTime_zero]
   ring

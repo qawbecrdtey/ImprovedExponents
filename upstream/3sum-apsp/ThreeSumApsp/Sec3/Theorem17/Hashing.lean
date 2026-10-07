@@ -2,6 +2,7 @@
 Copyright (c) 2026 Anthropic, PBC. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 SPDX-License-Identifier: Apache-2.0
+Modified in 2026 for ImprovedExponents (Jihoon Hyun): ported to Lean and Mathlib v4.35.0-rc2.
 -/
 module
 
@@ -282,7 +283,7 @@ theorem card_falsePositive_primes_le (hD : 16 ≤ D) (hT : T.WeightsPolyBounded 
   -- Each of these primes is at least `√D/2`.
   have hpow : (Real.sqrt D / 2) ^ divisors.card ≤ ∏ p ∈ divisors, (p : ℝ) := by
     rw [← Finset.prod_const]
-    exact Finset.prod_le_prod (fun _ _ => by linarith) fun p hp => (hmem p hp).2.1
+    exact Finset.prod_le_prod₀ (fun _ _ => by linarith) fun p hp => (hmem p hp).2.1
   have hY : 0 < 3 * (n : ℝ) ^ κ := lt_of_lt_of_le (by positivity) (hpow.trans hprod)
   rw [Real.le_logb_iff_rpow_le (by linarith) hY, Real.rpow_natCast]
   exact hpow.trans hprod
