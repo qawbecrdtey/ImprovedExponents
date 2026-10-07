@@ -1,0 +1,277 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/formalization.schema.json
+# formalization.yaml v0.4 (https://github.com/mathlib-initiative/formalization.yaml), in the shape of
+# the Palomar starter template (https://github.com/PalomarRegistry/PalomarTemplate). Check it with
+# `ruby scripts/validate-formalization.rb`. The Palomar submission is the configuration
+# comparator.json (ImprovedChallenge.lean / ImprovedSolution.lean, four theorems).
+version: "v0.4"
+
+project:
+  name: "Improved exponents for 3SUM and APSP from triangles in sparse lopsided graphs"
+  # The concise public registry abstract.
+  description: >-
+    A sorry-free Lean 4 formalization of improved running-time exponents for 3SUM, Exact Triangle,
+    the (min,+)-product and all-pairs shortest paths (APSP), on the word RAM of the published
+    formalization (anthropics/formal-math, 3sum-apsp) of the paper of Alman and Vassilevska
+    Williams, "Truly Subquadratic 3SUM and Truly Subcubic APSP via Triangles in Sparse Lopsided
+    Graphs" (arXiv:2610.06783). That paper gives deterministic algorithms for 3SUM in time
+    O(n^1.9992) and for the (min,+)-product and APSP in time O(n^2.99942), through Exact Triangle in
+    time O(n^(3 - 0.0017)). The project analyzes the same algorithm again and changes it in a few
+    places: an exact count of the leaves of its recursion, a host that charges the solver at the true
+    size of the middle part, and encodings restricted to the leaves that are read. The theorems
+    submitted state, in exactly the sense of upstream's trusted file EndStatement.lean (programs of
+    a word RAM with O(log n)-bit words, numbers of polynomial absolute value, every instance, every
+    size), that 3SUM is solved in O(n^1.99896) steps and Exact Triangle in O(n^2.99791) steps, and,
+    by carrying out the all-edges route that footnote 10 of the paper mentions, that the
+    (min,+)-product and APSP are solved in O(n^2.99791) steps instead of O(n^2.99931) through the
+    standard reductions. None of them has a hypothesis; every proof depends only on the axioms
+    propext, Classical.choice and Quot.sound. The library also proves general theorems for all
+    admissible parameters, a closed form for the optimal saving of the method at each ratio of
+    parameters, and that the supremum of that saving over all ratios lies in (0.002095, 0.002096],
+    so that no choice of parameters gives 3SUM an exponent below 1.998952 with this method. The
+    pruned encoder and the two new hosts are written as programs of the machine and their running
+    times are proved on it. All Lean, Python and LaTeX was written by the language model Claude
+    Fable 5.1 (Anthropic) in Claude Code, under the direction of the maintainer, who wrote no Lean
+    by hand. An accompanying paper (papers/improved-exponents/) states every result with its Lean
+    name.
+  # Required nonempty list of name strings. Palomar reserves this field for humans; the AI that
+  # wrote the code is recorded under `automation`.
+  authors:
+    - Jihoon Hyun
+  # Required root licence; matches the LICENSE file at the repository root.
+  license: "Apache-2.0"
+  responsible_maintainers:
+    - Jihoon Hyun
+
+# `repository` is omitted: this repository is the substantive proof development.
+
+classification:
+  arxiv:
+    - cs.DS
+    - cs.LO
+  msc2020:
+    - 68Q25
+    - 68W40
+    - 68V20
+
+sources:
+  # The result is first presented by this formalization and its accompanying paper.
+  - title: "Improved exponents for 3SUM and APSP from triangles in sparse lopsided graphs"
+    authors:
+      - Jihoon Hyun
+    id: "papers/improved-exponents/main.tex in this repository, at the submitted commit"
+    type: original-proof
+    location: "papers/improved-exponents/ (LaTeX source and main.pdf) in this repository"
+    relationship: other
+    note: >-
+      The accompanying paper, written together with the formalization. It states every theorem of
+      the project with its Lean name and proves them on paper in the order of the Lean development;
+      it has not been submitted to a journal or to arXiv. The exponents 1.99896 (3SUM) and 2.99791
+      (Exact Triangle, the (min,+)-product, APSP) improve the printed exponents 1.9992, 2.9983 and
+      2.99942 of the paper of Alman and Vassilevska Williams below; the algorithm is theirs, with the
+      changes described in project.description, and the all-edges route to APSP is the one that
+      their footnote 10 mentions, carried out as programs.
+    author_endorsement: participated
+  - title: "Truly Subquadratic 3SUM and Truly Subcubic APSP via Triangles in Sparse Lopsided Graphs"
+    authors:
+      - Josh Alman
+      - Virginia Vassilevska Williams
+    id: arXiv:2610.06783
+    type: paper
+    location: https://arxiv.org/abs/2610.06783
+    relationship: background
+    note: >-
+      The paper whose algorithm this project analyzes again and modifies: the first truly
+      subquadratic deterministic algorithm for 3SUM and the first truly subcubic one for APSP,
+      through Exact Triangle and thin matrix products with Schönhage's identity. Its own bounds are
+      proved by the formalization listed under related_formalizations, which is a dependency of
+      this project; this project reuses that machine model, those programs and those proofs. The
+      word RAM, the four problems and the meaning of "solved in time O(n^r)" of the submitted
+      statements are upstream's rendering of the paper's Theorem 2 and Section 1, copied verbatim
+      into ImprovedChallenge.lean. The authors of the paper were not involved in this project.
+    author_endorsement: not-contacted
+
+related_formalizations:
+  - id: https://github.com/anthropics/formal-math/tree/e1a4e6508154ea59f030480661590a9fe3018011/3sum-apsp
+    relationship: builds-on
+    note: >-
+      Anthropic's Lean 4 formalization of the paper of Alman and Vassilevska Williams (Apache-2.0),
+      a Lake dependency of this project at the pinned commit; it is not modified. It supplies the
+      trusted file EndStatement.lean (the word RAM, Problem.SolvedInTime and the four problems; its
+      132 lines of Lean are copied verbatim into ImprovedChallenge.lean, which imports nothing, and
+      scripts/check-endstatement.sh confirms the copy), the programs of the paper, their proofs, and
+      the lemmas that this project reuses by name. Several files of ImprovedExponents/ adapt
+      upstream developments for parameters or bounds that upstream fixes; NOTICE lists them.
+
+status:
+  scope: >-
+    Complete and sorry-free. The submitted configuration comparator.json covers the four theorems
+    of ImprovedChallenge.lean: 3SUM in O(n^1.99896) steps, Exact Triangle in O(n^2.99791) steps, the
+    (min,+)-product and APSP in O(n^2.99791) steps, on the word RAM of upstream's EndStatement.lean,
+    with no hypothesis (ImprovedExponents.threeSum_pruned, exactTriangle_pruned,
+    minPlus_allEdges_pruned, apsp_allEdges_pruned). The library ImprovedExponents/ proves more,
+    checked by `lake build` and not part of the submission: the same bounds for the three weaker
+    sets of ingredients (ImprovedExponents/Statements.lean), the general theorems for all admissible
+    parameters (allSolved_paper, allSolved_exact, allSolved_full, allSolved_pruned), every saving
+    below the supremum of the method (allSolved_pruned_sup, minPlusSolved_pruned_sup), the closed
+    form of the optimal saving at each ratio (isLUB_tupleSaving) and its global supremum
+    (optimum_global, optimum_global_full), the supremum of the paper's own accounting
+    (isLUB_paperSaving), and the certified comparison of the ten shapes of the paper's Table 2
+    (shapes_table). Not formalized: the informal discussion of mixtures of shapes, hypothetical
+    shapes and numerical experiments in the last section of the accompanying paper (marked there).
+    The constants hidden in O(·) are not computed. The programs exist as terms of upstream's
+    programming language compiled to the machine; the proofs describe them but no program is run.
+  # Counts for the proof development; the four deliberate `sorry`s of ImprovedChallenge.lean, which
+  # states each theorem with a placeholder proof by design, are excluded.
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms:
+    - propext
+    - Classical.choice
+    - Quot.sound
+  main_results:
+    - declaration: ImprovedExponents.threeSum_pruned
+      file: ImprovedChallenge.lean
+      sorry_count: 0
+      axioms: [propext, Classical.choice, Quot.sound]
+      comparator_config: comparator.json
+      literature_dependencies: []
+    - declaration: ImprovedExponents.exactTriangle_pruned
+      file: ImprovedChallenge.lean
+      sorry_count: 0
+      axioms: [propext, Classical.choice, Quot.sound]
+      comparator_config: comparator.json
+      literature_dependencies: []
+    - declaration: ImprovedExponents.minPlus_allEdges_pruned
+      file: ImprovedChallenge.lean
+      sorry_count: 0
+      axioms: [propext, Classical.choice, Quot.sound]
+      comparator_config: comparator.json
+      literature_dependencies: []
+    - declaration: ImprovedExponents.apsp_allEdges_pruned
+      file: ImprovedChallenge.lean
+      sorry_count: 0
+      axioms: [propext, Classical.choice, Quot.sound]
+      comparator_config: comparator.json
+      literature_dependencies: []
+
+automation:
+  methods:
+    - method: autonomous
+      models:
+        - "Claude Fable 5.1 (Anthropic, model id claude-fable-5-1)"
+      framework: "Claude Code (Anthropic's agentic coding tool), in the terminal"
+      tool_setup: >-
+        Claude Fable 5.1, run as an agent in Claude Code on the maintainer's Linux workstation,
+        wrote every line of Lean, Python and LaTeX in this repository, including the statement
+        module ImprovedChallenge.lean (apart from its verbatim copy of upstream's
+        EndStatement.lean), the proofs, the generator of the numerical certificates
+        (search/certs.py) and the accompanying paper, iterating against the Lean compiler and
+        against `lake build`, Comparator and the Python tests. The maintainer directed the work in
+        natural language: the choice of the paper, the goals (unconditional theorems, exact real
+        constants with numerals as corollaries, programs rather than hypotheses for the modified
+        parts, the optimum, footnote 10 as programs), the decisions on how results are stated, and
+        the review of the outputs; the maintainer wrote no Lean by hand.
+      cost:
+        wall_time: "not tracked; the files of the repository were created on 2026-10-06 and 2026-10-07"
+        spend_usd: not tracked
+        hardware: "the maintainer's Linux workstation (Lean, Lake, Python, LaTeX); the model through Anthropic's service"
+      prompting_notes: >-
+        Natural-language direction in interactive sessions: the paper to formalize and the upstream
+        formalization to build on; "sorry-free, with unproved parts only as explicit hypotheses",
+        later "no hypotheses: write the modified parts as programs"; "general statements with exact
+        real constants first, numerals as corollaries"; "reach the optimum of the method"; "carry out
+        footnote 10 as programs"; "run Comparator"; "prepare the project for the Palomar registry".
+  spend_usd: not tracked
+  notes: >-
+    The formalization was entirely automated in the sense that the model produced all code and text;
+    the human contribution is the direction, the decisions recorded above and the review of the
+    outputs. The mathematics formalized (the algorithm, its analysis, the reductions) is due to
+    Alman and Vassilevska Williams; the modifications and the new analysis were worked out by the
+    model in the course of the formalization, guided by the numerical exploration in search/. The
+    repository records the checks run (README.md, "How to check"); the registry's Comparator check
+    is independent of all of them.
+
+fidelity:
+  divergences: >-
+    The result is first presented here, so there is no cited statement to diverge from; the relation
+    to the paper of Alman and Vassilevska Williams is as follows. The machine, the four problems and
+    "solved in O(n^r) steps" are exactly those of upstream's EndStatement.lean (a deterministic word
+    RAM with nine kinds of instruction, each one step, words of W bits for every W ≥ b(⌊log₂ n⌋+1),
+    inputs of absolute value at most n^κ for every κ, every instance and every size n including 0;
+    T(n) = O(n^r) is stated with both sides raised to the power of the denominator of r, since core
+    Lean has no fractional powers; the constants of the bounds are not optimized and cells need not
+    be addressable by a word). The exponents are rational numerals; the general theorems of the
+    library quantify over real parameters. The bounds for the (min,+)-product and APSP stated in the
+    submission are those of the all-edges route (footnote 10 of the paper), which keeps the whole
+    saving of Exact Triangle; the bounds through the standard reductions (a third of the saving,
+    O(n^2.99931)) are also proved (ImprovedExponents.minPlus_pruned, apsp_pruned) but are not part
+    of the submission. The accompanying paper's remarks that are not machine-checked are marked
+    "not formalized" in its text.
+
+review:
+  status: self-assessed
+  reviewers:
+    - "Jihoon Hyun (maintainer)"
+  notes: >-
+    The maintainer directed the work and reviewed its outputs; no independent human review of the
+    Lean statements has taken place. Mechanical checks recorded in README.md at the submitted
+    commit: `lake build` of the
+    library with no sorry and no warning outside the statement module; Comparator
+    (leanprover/comparator and lean4export at their releases v4.33.0 built with the project's
+    toolchain v4.33.1, the independent kernel nanoda and the sandbox landrun at the revisions of
+    upstream's continuous integration; scripts/comparator.sh, log
+    scripts/comparator-run.log) accepting comparator.json;
+    scripts/check-endstatement.sh confirming that ImprovedChallenge.lean contains upstream's
+    EndStatement.lean verbatim; the generated certificates matching their generator; the Python
+    tests; and every Lean name cited in the accompanying paper existing in the sources.
+
+alignment:
+  # Namespace of the proof development; the compared declarations are in it too.
+  namespace: ImprovedExponents
+  statements:
+    - source: >-
+        Theorem T1 of the accompanying paper (Section 7): 3SUM in O(n^1.99896) steps, improving
+        O(n^1.9992) of Alman and Vassilevska Williams (their Theorem 22)
+      lean: ImprovedExponents.threeSum_pruned
+      module: ImprovedChallenge
+      status: proved
+      note: >-
+        EndStatement.ThreeSum.SolvedInTime 1.99896, with upstream's EndStatement.lean inlined.
+        Proved in ImprovedExponents/Statements.lean from allSolved_pruned
+        (ImprovedExponents/Pipeline/PrunedClaim.lean) at the ratio c = 22.
+    - source: >-
+        Theorem T1 of the accompanying paper: Exact Triangle in O(n^2.99791) steps, improving
+        O(n^(3 - 0.0017)) (their Theorem 19)
+      lean: ImprovedExponents.exactTriangle_pruned
+      module: ImprovedChallenge
+      status: proved
+      note: EndStatement.ExactTriangle.SolvedInTime 2.99791; the same route.
+    - source: >-
+        Theorem on the all-edges route of the accompanying paper (Section 7, footnote 10 of the
+        paper of Alman and Vassilevska Williams): the (min,+)-product in O(n^2.99791) steps,
+        improving O(n^2.99942) (their Theorem 22)
+      lean: ImprovedExponents.minPlus_allEdges_pruned
+      module: ImprovedChallenge
+      status: proved
+      note: >-
+        EndStatement.MinPlusProduct.SolvedInTime 2.99791. Proved from minPlusSolved_pruned
+        (ImprovedExponents/Statements.lean): the all-edges host (ImprovedExponents/AllEdges/Host/)
+        and the reduction from all pairs (ImprovedExponents/AllEdges/Pairs/), then upstream's bit
+        search.
+    - source: >-
+        The same theorem: APSP in O(n^2.99791) steps, improving O(n^2.99942) (their Theorem 22)
+      lean: ImprovedExponents.apsp_allEdges_pruned
+      module: ImprovedChallenge
+      status: proved
+      note: >-
+        EndStatement.APSP.SolvedInTime 2.99791, for directed graphs with integer weights and no
+        negative cycle (upstream's rendering); upstream's repeated squaring on top of the
+        (min,+)-product.
+
+acknowledgements: >-
+  The algorithms, the reductions and the framework of thin products are due to Josh Alman and
+  Virginia Vassilevska Williams, and this project would not exist without their paper. The
+  formalization builds on Anthropic's Lean 4 formalization of that paper (anthropics/formal-math,
+  3sum-apsp), whose machine model, programs and proofs it reuses, and on Mathlib. It is checked
+  with Lean's kernel and, through Comparator, with the independent kernel NanoDa. The scripts of
+  the Palomar starter template are reused under its licence (NOTICE).

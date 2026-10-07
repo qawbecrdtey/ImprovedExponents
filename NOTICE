@@ -1,0 +1,80 @@
+ImprovedExponents
+Copyright (c) 2026 Jihoon Hyun. Released under the Apache License, Version 2.0 (file LICENSE).
+
+The Lean code, the Python code and the LaTeX text of this repository were written by the
+language model Claude Fable 5.1 (Anthropic), run as an agent in Claude Code, under the direction
+of Jihoon Hyun; see README.md, "Who did what", and formalization.yaml.
+
+This project depends on, and in places adapts, the Lean formalization
+
+    anthropics/formal-math, directory 3sum-apsp
+    https://github.com/anthropics/formal-math/tree/main/3sum-apsp
+    Copyright (c) 2026 Anthropic, PBC. Released under the Apache License, Version 2.0.
+
+of the paper "Truly Subquadratic 3SUM and Truly Subcubic APSP via Triangles in Sparse Lopsided
+Graphs" by Josh Alman and Virginia Vassilevska Williams (arXiv:2610.06783). The algorithms that
+this project analyzes and modifies are theirs.
+
+ImprovedChallenge.lean contains, between the documentation comment "Claims of the paper ..." and
+the line "end EndStatement", the file EndStatement.lean of that formalization, copied without any
+change (scripts/check-endstatement.sh confirms this). Its comments quote statements and sentences
+of the paper, as the upstream NOTICE records.
+
+The following files contain proofs or definitions adapted from that formalization; the places are
+marked in the files ("adapted from upstream"). They redo an upstream development for parameters or
+bounds that upstream fixes, and follow its text closely.
+
+    ImprovedExponents/Pipeline/OfflineWithin.lean   (ThreeSumApsp/Programs/Sec4/ChoosingParameters/RealParameters.lean)
+    ImprovedExponents/Pipeline/ThinClaim.lean       (ThreeSumApsp/Programs/Sec4/Corollary26/AllInstances.lean, Claim.lean,
+                                                     ThreeSumApsp/Programs/Sec4/ChoosingParameters/Program.lean)
+    ImprovedExponents/Pipeline/RegimeRS.lean        (ThreeSumApsp/Programs/Sec4/ChoosingParameters/Program.lean,
+                                                     ThreeSumApsp/Programs/Sec3/Theorem17/Parameters/Sizes.lean,
+                                                     ThreeSumApsp/Programs/Sec2/Theorem5/AllInstances/RegimeTest.lean)
+    ImprovedExponents/Cost8X/*.lean                 (ThreeSumApsp/Sec4/Theorem30.lean, Corollary31.lean, ParameterSteps.lean,
+                                                     ThreeSumApsp/Programs/Sec4/Theorem30/Time.lean, TimeOfBlock.lean,
+                                                     ThreeSumApsp/Programs/Sec4/ChoosingParameters/Costs.lean)
+    ImprovedExponents/HostMid/*.lean                (ThreeSumApsp/Programs/Sec3/Theorem17/Host/*.lean, Claim.lean,
+                                                     ClaimAtParameters.lean, TimeBound/Total.lean)
+    ImprovedExponents/ParamRoutines/*.lean          (ThreeSumApsp/Programs/Sec3/Theorem17/ClaimAtParameters.lean,
+                                                     Parameters/Sizes.lean)
+    ImprovedExponents/Total/Uniform.lean            (ThreeSumApsp/TimeClaims/Sec3/Theorem19.lean)
+    ImprovedExponents/AllEdges/Pairs/Passes.lean    (ThreeSumApsp/Programs/Sec3/Theorem21b/MinPlus/Passes.lean)
+    ImprovedExponents/AllEdges/Pairs/Host.lean      (ThreeSumApsp/Programs/Sec3/Theorem21b/NegativeTriangle/Host.lean)
+    ImprovedExponents/AllEdges/Pairs/TimeBound.lean (ThreeSumApsp/Programs/Sec3/Theorem21b/MinPlus/TimeBound.lean)
+    ImprovedExponents/AllEdges/Host/Flags.lean      (ThreeSumApsp/Programs/Sec3/Theorem17/Host/InstanceFacts.lean)
+    ImprovedExponents/AllEdges/Host/ScanPairsAE.lean (ThreeSumApsp/Programs/Sec3/Theorem17/Witnesses/ScanPairs.lean)
+    ImprovedExponents/AllEdges/Host/BruteAE.lean    (ThreeSumApsp/Programs/Sec3/Theorem17/Witnesses/BruteForce.lean)
+    ImprovedExponents/AllEdges/Host/LoopAE.lean     (ThreeSumApsp/Programs/Sec3/Theorem17/Host/Loop.lean)
+    ImprovedExponents/AllEdges/Host/HostAE.lean     (ThreeSumApsp/Programs/Sec3/Theorem17/Host/Arrays.lean, Time.lean;
+                                                     via ImprovedExponents/HostMid/Arrays.lean, Time.lean, Need.lean)
+    ImprovedExponents/AllEdges/Host/ProgramAE.lean  (ThreeSumApsp/Programs/Sec3/Theorem17/Host/ParametersStage.lean,
+                                                     Correct.lean, Program.lean; via ImprovedExponents/HostMid/Need.lean,
+                                                     Correct.lean, Program.lean)
+    ImprovedExponents/AllEdges/Host/ClaimAE.lean    (ThreeSumApsp/Programs/Sec3/Theorem17/TimeBound/Total.lean,
+                                                     ClaimAtParameters.lean; via ImprovedExponents/HostMid/AtParameters.lean)
+    ImprovedExponents/PrunedProgram/Encode/*.lean   (ThreeSumApsp/Programs/Sec2/Theorem5/Encode/Recursion.lean, Meaning.lean,
+                                                     Contract.lean, AllBands.lean)
+    ImprovedExponents/PrunedProgram/Shared/*.lean   (ThreeSumApsp/Programs/Sec2/Theorem5/SharedStage.lean, Contracts.lean,
+                                                     CellDependencies.lean)
+    ImprovedExponents/PrunedProgram/Pre/*.lean      (ThreeSumApsp/Programs/Sec4/Theorem30/Memory.lean, Preprocessing.lean,
+                                                     Directory.lean, Areas.lean, Routines.lean, Program.lean)
+    ImprovedExponents/PrunedProgram/Tiles/*.lean    (ThreeSumApsp/Programs/Sec4/Theorem30/Contracts.lean, FillList.lean,
+                                                     Tile.lean, AllTiles.lean)
+    ImprovedExponents/PrunedProgram/Query/*.lean    (ThreeSumApsp/Programs/Sec4/Theorem30/Contracts.lean, QuerySum.lean,
+                                                     Query.lean, Routines.lean, Program.lean)
+    ImprovedExponents/PrunedProgram/Wrapper/*.lean  (ThreeSumApsp/Programs/Sec4/ChoosingParameters/Parameters.lean,
+                                                     Preprocessing.lean, Offline.lean, Program.lean,
+                                                     ThreeSumApsp/Programs/Sec4/Theorem30/Program.lean)
+    ImprovedExponents/Cost8P/*.lean                 (via ImprovedExponents/Cost8X/*.lean, the same upstream files)
+
+The upstream NOTICE applies to the adapted parts: comments quote statements and sentences of the
+paper of Alman and Vassilevska Williams as upstream does.
+
+scripts/check-lean-sources.py and scripts/validate-formalization.rb are copied from
+
+    PalomarRegistry/PalomarTemplate
+    https://github.com/PalomarRegistry/PalomarTemplate (commit 2891de4)
+    Released under the Apache License, Version 2.0.
+
+and scripts/verify-comparator.sh and scripts/install-bwrap.sh are adapted from the scripts of the
+same name in that repository and in PalomarRegistry/PalomarSubmission (MIT License).

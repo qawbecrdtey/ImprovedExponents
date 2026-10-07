@@ -1,0 +1,333 @@
+%% LEAN NAMES of the four theorems (file ImprovedExponents/Statements.lean):
+%%   \lean{threeSum_paper}    Theorem T2 (the paper's exponents, better parameters)
+%%   \lean{threeSum_exact}    Theorem T3 (+ exact count)
+%%   \lean{threeSum_full}     Theorem T4 (+ true middle size)
+%%   \lean{threeSum_pruned}   Theorem T1 (+ pruned encodings)
+%% with exactTriangle_*, minPlus_*, apsp_* for the other problems, the savings
+%% allSolved_*_num, and the general theorems allSolved_paper, allSolved_exact,
+%% allSolved_full (Pipeline/General.lean), allSolved_pruned (Pipeline/PrunedClaim.lean).
+
+\section{Consequences for 3SUM and APSP}
+\label{sec:consequences}
+
+The theorems of this section are statements about programs of the word RAM, in
+the sense of Section~\ref{sec:machine}.  Four are for Exact Triangle and its
+consequences; they add the ingredients one at a time, and the first adds none.
+The fifth is the all-edges route to APSP.
+
+\subsection{From Exact Triangle to the three problems}
+
+\begin{proposition}[\cite{upstream}]\label{prop:transfer}
+Let \(0\le\delta\le1\), and suppose that a program solves Exact Triangle on
+\(n\) vertices per part with weights up to \(n^{\nu}\) in time
+\(O(\nu\,n^{3-\delta}(\log n)^{e})\), uniformly in \(\nu\).  Then
+\lean{ThreeSum.SolvedInTime}~\(a\) holds for every rational \(a>2-\delta/2\), and
+\lean{MinPlusProduct.SolvedInTime}~\(a\) and \lean{APSP.SolvedInTime}~\(a\) hold for
+every rational \(a>3-\delta/3\).
+\end{proposition}
+
+These are Theorem~21(a),(b) of the paper as formalized upstream
+(\lean{threeSum_of_uniform}, \lean{minPlus_polylog_of_uniform},
+\lean{apsp_polylog_of_uniform}).  The hypothesis is obtained from the bound of
+Theorem~\ref{thm:total}, which holds from some size on, by solving smaller
+instances by brute force (\lean{exactTriangleUniform_of_explicitFrom}).
+
+\subsection{The regime test}
+\label{sec:regime}
+
+The upstream solver of the thin product tests whether \(D^{18}\le N\); it runs
+the recursion if so and brute force if not.  The test is part of the program
+text, and it restricts the ratios at which the program can be used.
+\begin{itemize}
+\item The recursion must be applicable in the whole regime \(D^{18}\le N\): the
+  tile \(\sqrt K N_0\) must fit into \(N\).  For all large \(m\) this holds if
+  \(\Apr(c)<18\ln 4\), that is, for \(c<\cFitsMax\ldots\)
+  (\lean{exists_fits18}).
+\item The instances with \(D\le N^{\varepsilon}\) must lie in the regime:
+  \(\varepsilon\le1/18\).  If \(\Afull(c)\ge18\ln 4\), that is, for
+  \(c\ge\cFullMin\ldots\), then \(\Rc(\gamma)\le\Rc(0)\le1/18\), and every
+  admissible \(\varepsilon\) qualifies (\lean{thinR_le_inv}).
+\end{itemize}
+Both conditions hold at \(c=\cUncond\) (\lean{basePruned_108_5_lt},
+\lean{baseFull_ge_18}), and the numerals of Theorems~\ref{thm:T2}
+and~\ref{thm:T3}, which use the program as it is, are obtained there.  The
+optimum \(c\approx\cFullApprox\) of the paper's encodings lies just below this
+range: there \(\varepsilon\) has to exceed \(1/18\) slightly, while
+\(\Apr(c)/\ln4\approx17.6\).
+
+For Theorem~\ref{thm:T4} we therefore add a test with a rational exponent.
+Three procedures are appended to the upstream program (\lean{programRS}): a
+test \(D^{r}\le N^{s}\) for natural numbers \(r,s\) (\lean{testRSBody}: it
+computes \(N^{s}\) by a loop and decides \(D^{r}<N^{s}+1\) with upstream's
+routine \lean{powLtBody}, never forming a number above \(N^{s}D+N^{s}+D+r+s\)),
+and a copy of the dispatching procedure that calls it.  The analysis of the
+solver is carried out once for an abstract regime (\lean{RegimeTest},
+\lean{thinClaimR_of_offlineWithin}), of which the upstream test and the new one
+are two instances (\lean{regime18}, \lean{regimeRS}).  With the new test the two
+conditions above become \(\Apr(c)<(r/s)\ln4\) and \(\varepsilon\le s/r\)
+(\lean{exists_fitsRS}, \lean{thinClaimRS_gammaX}).  Such a fraction exists for
+every admissible \(\varepsilon\): \(\varepsilon<\Rc(\gamma)\) means
+\(1/\varepsilon>(\Afull(c)+\gamma\ln4)/\ln4>\Apr(c)/\ln4\), since
+\(\Apr\le\Afull\) (\lean{basePruned_le_baseFull}).  The only remaining
+condition on the ratio is \(\varepsilon\le1/16\), needed by the arithmetic of
+Theorem~\ref{thm:total}; \(\Afull(c)\ge16\ln4\) for \(c\ge20\) gives it
+(\lean{baseFull_ge_16}).
+
+\subsection{The four theorems}
+
+\begin{theorem}[The paper's exponents with better parameters]\label{thm:T2}
+With the program, the reduction and the leaf count of the paper, at
+\(c=\cUncond\) and suitable rational \(\theta\), \(\varepsilon\) and \(\eta\):
+Exact Triangle is solved in time \(O(n^{3-\dTwo})\).  Consequently
+\lean{ThreeSum.SolvedInTime} holds with the exponent \(\ThreeSumTwo\), and
+\lean{MinPlusProduct.SolvedInTime} and \lean{APSP.SolvedInTime} with the
+exponent \(\APSPTwo\).
+\end{theorem}
+
+Nothing is new here except the choice of parameters.  Corollary~26 of the paper
+rounds \(\varepsilon\) down to \(1/18\) and takes \(c=21\); with
+\(\gamma=\min(\gpap(c,\theta),\frac12-q(\theta))\) balanced and
+\(\varepsilon\) close to \(\Rc(\gamma)\) the saving
+\(\varepsilon\gamma/2\) exceeds \(\dTwo\) (\lean{t2_witness}).  In Lean: the general
+statement is \lean{allSolved_paper}, from \lean{thinClaim_gammaOf},
+\lean{hostBound_rat} and \lean{explicitFrom_original}; the saving is
+\lean{allSolved_paper_num}, and the end statements are
+\lean{exactTriangle_paper}, \lean{threeSum_paper}, \lean{minPlus_paper} and
+\lean{apsp_paper}.
+
+\begin{theorem}[With the exact count]\label{thm:T3}
+With the same program, analyzed by Theorem~\ref{thm:offline}: Exact Triangle is
+solved in time \(O(n^{3-\dThree})\).  Consequently
+\lean{ThreeSum.SolvedInTime} holds with the exponent \(\ThreeSumThree\), and
+\lean{MinPlusProduct.SolvedInTime} and \lean{APSP.SolvedInTime} with the
+exponent \(\APSPThree\).
+\end{theorem}
+
+In Lean: \lean{allSolved_exact}, from \lean{thinClaim_gammaX} and the same
+reduction; the witness is \lean{t3_witness}, the saving
+\lean{allSolved_exact_num}, and the end statements are
+\lean{exactTriangle_exact}, \lean{threeSum_exact}, \lean{minPlus_exact} and
+\lean{apsp_exact}.
+
+\begin{theorem}[With the true middle size]\label{thm:T4}
+Let \(c\ge20\) and \(0\le\delta<F_{\Afull(c)}(\Gam(c))\).  With the host of
+Theorem~\ref{thm:mid}, the thin product of Theorem~\ref{thm:offline} and the
+regime test with a rational exponent, Exact Triangle is solved in time
+\(O(n^{3-\delta})\); consequently so is every \(\delta\) below
+\(\sup_{c>10}F_{\Afull(c)}(\Gam(c))\in(\SfullLo,\SfullHi]\).  At
+\(c=\cUncondOpt\) this holds for \(\delta=\SfullLo\).  Consequently
+\lean{ThreeSum.SolvedInTime} holds with the exponent \(\ThreeSumFour\), and
+\lean{MinPlusProduct.SolvedInTime} and \lean{APSP.SolvedInTime} with the
+exponent \(\APSPFour\).
+\end{theorem}
+
+\begin{proof}
+By Theorem~\ref{thm:sup} and Proposition~\ref{prop:rational} there is an
+admissible rational tuple \((c',\theta',\sigma',\varepsilon')\) near \(c\) with
+saving above \(\delta\).  Lower \(\gamma\) below \(\gX(c',\theta')\) and
+\(\varepsilon\) to a rational so that the saving stays above \(\delta\)
+(\lean{exists_gamma_rat_of_lt}), and choose \(r/s\) between
+\(\Apr(c')/\ln4\) and \(1/\varepsilon'\) (Section~\ref{sec:regime}).
+Theorem~\ref{thm:offline} with the new test gives the thin product, and
+Theorem~\ref{thm:total} with \(\eta=1-1/(2\sigma)\) and
+\(d=\varepsilon/(1-\eta)\) slightly lowered gives Exact Triangle.  Its second
+condition holds because \(\frac32d\le3\sigma\varepsilon\) and
+\(\delta<\varepsilon(1-\sigma)\), so
+\(\frac32d+\delta<(1+2\sigma)\varepsilon<3\varepsilon\le\frac3{16}\).  The
+supremum over \(c\) is Theorem~\ref{thm:global-full}, and the value at
+\(c=\cUncondOpt\) is Proposition~\ref{prop:values}(i).
+\end{proof}
+
+In Lean: \lean{allSolved_full} is the statement for every \(c\ge20\),
+\lean{allSolved_full_sup} the statement for every saving below the supremum
+\lean{SstarFull}, \lean{allSolved_full_num} the saving at \(c=\cUncondOpt\),
+and the end statements are \lean{exactTriangle_full}, \lean{threeSum_full},
+\lean{minPlus_full} and \lean{apsp_full}.  The five-digit exponents are those
+of \(\delta=\dFour\): the optimum improves the saving at \(c=\cUncond\) by less
+than \(2\cdot10^{-7}\).
+
+\begin{theorem}[With pruned encodings]\label{thm:T1}
+Let \(c\ge21\) and \(0\le\delta<F_{\Apr(c)}(\Gam(c))\).  With the host of
+Theorem~\ref{thm:mid} and the thin product of Theorem~\ref{thm:encoder}, Exact
+Triangle is solved in time \(O(n^{3-\delta})\); consequently so is every
+\(\delta\) below \(\sup_{c>10}F_{\Apr(c)}(\Gam(c))\in(\SstarLo,\SstarHi]\).  At
+\(c=\cCond\) this holds for \(\delta=\dOne\).  Consequently
+\lean{ThreeSum.SolvedInTime} holds with the exponent \(\ThreeSumOne\), and
+\lean{MinPlusProduct.SolvedInTime} and \lean{APSP.SolvedInTime} with the
+exponent \(\APSPOne\).
+\end{theorem}
+
+The proof is that of Theorem~\ref{thm:T4} with \(\RcP\) in place of \(\Rc\) and
+Theorem~\ref{thm:encoder} in place of Theorem~\ref{thm:offline}; the test with
+a rational exponent is part of the program \lean{programP}.  For \(c\ge21\) we
+have \(\Apr(c)\ge16\ln4\) (\lean{basePruned_ge_16}), so \(\varepsilon\le1/16\)
+and \(\frac32d+\delta<3\varepsilon\le0.19\).  The supremum over \(c\) is
+Theorem~\ref{thm:global}.  At \(c=\cCond\) the parameters are
+\(\Gam>\GamCond\), \(\theta\approx\thetaCond\), \(\sigma\approx\sigmaCond\) and
+\(\varepsilon\) just below \(R>\epsCond\) (\lean{Gam_22_bounds},
+\lean{thinR_pruned_bounds}, \lean{savingF_pruned_gt}).  In Lean:
+\lean{allSolved_pruned} is the statement for every \(c\ge21\) (file
+\lean{Pipeline/PrunedClaim.lean}; the form that still takes the thin-product
+claim as an argument is \lean{allSolved_pruned_of_claim}, from
+\lean{explicitFrom_pruned_of_claim}), \lean{allSolved_pruned_sup} the
+statement for every saving below the supremum \lean{SstarPruned},
+\lean{allSolved_pruned_num} the saving at \(c=\cCond\), and the end statements
+are \lean{exactTriangle_pruned}, \lean{threeSum_pruned}, \lean{minPlus_pruned}
+and \lean{apsp_pruned}.  No hypothesis is involved.
+
+\subsection{APSP through all-edges Exact Triangle}
+\label{sec:alledges}
+
+Footnote~10 of the paper observes that APSP can keep all of the saving of Exact
+Triangle instead of a third: "the proof of Theorem~17 also solves the
+all-edges version of Exact Triangle (scanning each pair only until its zero
+triangle is found), to which the \(\minplus\)-product reduces on the same \(n\)
+vertices".  We carry this out as programs.  The \emph{all-edges version} of
+Exact Triangle asks, for every pair \((a,b)\) of the two outer parts, whether
+some \(c\) makes \(w(a,b)+w(b,c)+w(a,c)=0\); as a task of the machine
+(\lean{aeTask}) it writes the \(n^{2}\) answers to an output array
+(\lean{aeFlags}).
+
+\begin{lemma}[Comparisons as equalities]\label{lem:F}
+Let \(0\le x,y,u<2^{b}\) be integers and
+\(f(\ell)=\lfloor u/2^{\ell}\rfloor-\lfloor x/2^{\ell}\rfloor-\lfloor y/2^{\ell}\rfloor\).
+Then
+\[
+  x+y<u\iff f(0)=1\ \text{ or }\ f(\ell)\in\{2,3\}\text{ for some }\ell\le b .
+\]
+\end{lemma}
+
+\begin{proof}
+\(f(b)=0\), and \(f(\ell)=2f(\ell+1)+e_\ell\), where \(e_\ell\in\{-2,-1,0,1\}\)
+is the bit of \(u\) at position \(\ell\) minus those of \(x\) and \(y\).  So
+\(f(\ell+1)\ge2\) implies \(f(\ell)\ge2\).  If \(f(\ell)\in\{2,3\}\) for some
+\(\ell\), then \(f(0)\ge2\) by descent, and \(f(0)=u-x-y\).  Conversely let
+\(f(0)\ge1\).  If \(f(0)\ne1\), let \(\ell\) be the largest index with
+\(f(\ell)\ge2\); then \(\ell<b\), \(f(\ell+1)\le1\) and
+\(f(\ell)\le2f(\ell+1)+1\le3\).
+\end{proof}
+
+In Lean: \lean{add_lt_iff_shiftDiff}.
+
+\begin{proposition}\label{prop:minplus-math}
+Let \(A,B\) be \(n\times n\) integer matrices with entries of absolute value at
+most \(W\), let \(2W<2^{b}\), and let \(t\) be a matrix of thresholds with
+\(-2W\le t_{ij}<2^{b}-2W\).  For \(\ell\le b\) put
+\(X_\ell(i,k)=\lfloor(A_{ik}+W)/2^{\ell}\rfloor\),
+\(Y_\ell(k,j)=\lfloor(B_{kj}+W)/2^{\ell}\rfloor\) and
+\(U_\ell(i,j)=\lfloor(t_{ij}+2W)/2^{\ell}\rfloor\).  Then, for every pair
+\((i,j)\), there is a \(k\) with \(A_{ik}+B_{kj}<t_{ij}\) if and only if, for
+one of the \(2b+3\) pairs \((\ell,r)\) with \((\ell,r)=(0,1)\) or
+\(r\in\{2,3\}\), there is a \(k\) with
+\[
+  X_\ell(i,k)+Y_\ell(k,j)+\bigl(r-U_\ell(i,j)\bigr)=0 .
+\]
+Consequently a binary search that runs for all pairs \((i,j)\) in parallel
+computes the \(\minplus\)-product of \(A\) and \(B\) from the answers to
+\(R(2R+3)\) all-edges Exact Triangle instances on the same \(n\) vertices per
+part, where \(R=\lceil\log_2(4W+1)\rceil\).
+\end{proposition}
+
+\begin{proof}
+Apply Lemma~\ref{lem:F} to \(x=A_{ik}+W\), \(y=B_{kj}+W\) and
+\(u=t_{ij}+2W\).  The entry \(C_{ij}\) of the product is the unique integer
+\(c\in[-2W,2W]\) such that the answer is negative for the threshold \(c\) and
+positive for \(c+1\); a binary search finds it in \(R\) rounds, and a round
+asks one matrix of thresholds.
+\end{proof}
+
+In Lean: \lean{exists_lt_iff_exists_exactTriangle}, \lean{minPlus_unique},
+\lean{search_eq_minPlus} and \lean{search_exactTriangle}.
+
+The reduction of the paper (Theorem~21(b), \cite{VW18}) ends with a binary search of
+exactly this kind, over a procedure that answers the threshold questions for
+all pairs at once (\lean{pairsTask}, \lean{isHost_mp}), followed by
+repeated squaring for APSP (\lean{claim_apspFromMinPlus}).  The factor \(3\) is
+lost before that, in a blocking of size \(n^{1/3}\) that reduces the all-pairs
+questions to the decision problem.  Two hosts replace the blocking.
+
+\begin{theorem}[All pairs from all-edges Exact Triangle]\label{thm:pairs}
+There is a program that, given a procedure solving all-edges Exact Triangle
+within \(T(n,U)\) steps, answers the threshold questions of
+Proposition~\ref{prop:minplus-math} for all pairs within
+\((2b+3)\bigl(T(n,9U)+O(n^{2})\bigr)+O(n^{2})\) steps, where
+\(b=\lfloor\log_2 3U\rfloor+1\); in particular within
+\(O\bigl((1+\log U)(T(n,9U)+n^{2})\bigr)\).
+\end{theorem}
+
+\begin{proof}
+With \(W=U\) the hypotheses of Proposition~\ref{prop:minplus-math} hold, and
+the weights of the instances are at most \(2^{b}+3\le9U\).  The program writes
+\(A+U\), the transpose of \(B+U\) and \(t+2U\), and then runs the \(b\) levels
+from the top: at each level it asks the two instances with \(r=2,3\) and takes
+the disjunction of their answers into the output, then halves every number
+(upstream's pass for \(\lfloor x/2^{\ell}\rfloor\), which avoids division); at
+level \(0\) it also asks \(r=1\).  The output is then the matrix of answers.
+\end{proof}
+
+In Lean: \lean{isHost_pairsAE} with the time \lean{pairsTimeAE}, from the
+bridge \lean{pairFlags_iff} between the two tasks and the invariant
+\lean{orFlags_eq_pairFlags}; the bound \lean{pairsTimeAE_le} with the constant
+\lean{CA}, and the transfer \lean{pairsFromAllEdges}.
+
+\begin{theorem}[Theorem~\ref{thm:mid} for the all-edges version]\label{thm:mid-ae}
+Theorem~\ref{thm:mid} holds for all-edges Exact Triangle in place of Exact
+Triangle, with the same bound and another constant \(C\).
+\end{theorem}
+
+\begin{proof}
+The host of Theorem~17 keeps \(n^{2}\) flags, one per pair \((a,b)\), zero at
+the start.  For every query pair that an instance accepts and whose flag is
+still \(0\), it scans the piece \(C_k\) of the instance and stores the result
+in the flag; pairs whose flag is \(1\) are skipped.  Every pair with a zero
+triangle is accepted, and hit, in the instance of the piece of its \(c\), so
+the flags are the answers at the end.  A scan either fails, which the paper
+charges to a false positive of the prime, or turns a flag from \(0\) to \(1\);
+so there are at most \(F(p)+n^{2}\) scans.  The \(n^{2}\) additional scans cost
+\(O(n^{2}\sqrt{D'}/g')\), which is within the term \(n^{2}D'g'\); zeroing and
+copying the flags costs \(O(n^{2})\).
+\end{proof}
+
+In Lean the pure part is \lean{flagsAt_m} (the flags after all instances are
+the answers) and \lean{sum_execsAE_le} (the count of the scans); the
+procedure that scans the accepted pairs is \lean{scanPairsAEBody}, the brute
+force of the small case \lean{bruteAEBody}, the host \lean{ae17_solves}, its
+time \lean{hostTimeAE} and \lean{obeysBound17Mid_hostTimeAE}, and the claim
+\lean{claim17MidAE_of_pack}.  The statement of Theorem~\ref{thm:mid} is the
+same proposition \lean{Claim17Mid} in a time model (\lean{lightModelAE}) whose
+reading of "Exact Triangle" is the all-edges task; the deductions of
+Sections~\ref{sec:middle} and~\ref{sec:consequences} are made for an arbitrary
+model, so they apply unchanged (\lean{MidHostRat}, \lean{midHostRat_ae},
+\lean{explicitFrom_full}, \lean{explicitFrom_pruned}).
+
+\begin{theorem}[APSP through all-edges Exact Triangle]\label{thm:apsp-ae}
+Let \(c\ge20\) and \(0\le\delta<F_{\Afull(c)}(\Gam(c))\), or let \(\delta\) be
+any number below \(\sup_{c>10}F_{\Afull(c)}(\Gam(c))>\SfullLo\).  Then the
+\(\minplus\)-product and APSP are solved in time \(O(n^{a})\) for every
+rational \(a>3-\delta\); consequently \lean{MinPlusProduct.SolvedInTime} and
+\lean{APSP.SolvedInTime} hold with the exponent \(\APSPFn\).  With pruned
+encodings the same holds for \(c\ge21\) and \(\delta<F_{\Apr(c)}(\Gam(c))\),
+for every \(\delta<\sup_c F_{\Apr(c)}(\Gam(c))>\SstarLo\), and with the
+exponent \(\APSPFnOne\).
+\end{theorem}
+
+\begin{proof}
+Theorems~\ref{thm:T4} and~\ref{thm:T1} with Theorem~\ref{thm:mid-ae} in place
+of Theorem~\ref{thm:mid} give all-edges Exact Triangle in time
+\(O(n^{3-\delta}\log n)\) for weights up to \(n^{O(1)}\).  Theorem~\ref{thm:pairs}
+and the search of Proposition~\ref{prop:minplus-math} (upstream's program,
+\(O(\log U)\) rounds at the bound \(6U\)) give the \(\minplus\)-product of
+matrices with entries up to \(u\) in time \(O(\log^{2}u\,(T(n,54u)+n^{2}))\),
+and repeated squaring gives APSP with \(O(\log n)\) products of matrices with
+entries up to \(O(n\,u)\).  Along \(u=n^{\kappa}\) every factor is
+\(n^{3-\delta}\) times a polylogarithm.
+\end{proof}
+
+In Lean: \lean{minPlusSolved_full}, \lean{minPlusSolved_full_sup},
+\lean{minPlusSolved_pruned} and \lean{minPlusSolved_pruned_sup} (the structure
+\lean{MinPlusSolved}), through \lean{solvedIn_mp_of_allEdges},
+\lean{minPlusInPolylog_of_explicitFrom}, \lean{apspInPolylog_of_explicitFrom}
+and \lean{minPlusSolved_of_explicitFrom}; the end statements are
+\lean{minPlus_allEdges}, \lean{apsp_allEdges}, and with pruned encodings
+\lean{minPlus_allEdges_pruned}, \lean{apsp_allEdges_pruned}, the strongest
+statements of the paper for the \(\minplus\)-product and APSP.

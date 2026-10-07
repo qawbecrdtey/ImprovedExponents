@@ -1,0 +1,130 @@
+\section{Charging the solver at the true size of the middle part}
+\label{sec:middle}
+
+In the reduction of Section~\ref{sec:host} the middle part of an instance is
+\(C_k\times\Z_p\) with \(|C_k|\le\lceil s/g'\rceil\) and \(p\le s\),
+\(s=\lfloor\sqrt{D'}\rfloor\).  So it has at most
+\[
+  \operatorname{mid}(D',g'):=\Bigl\lceil\frac{s}{g'}\Bigr\rceil s\approx\frac{D'}{g'}
+\]
+vertices.  The paper hands the instance to the solver as an instance of
+\(\LopTri(n,D')\) and charges it accordingly.  Handing it over as an instance
+of \(\LopTri(n,\operatorname{mid}(D',g'))\) changes one assignment of the
+program and separates two roles of \(D'\): the number of query pairs is
+governed by \(\sqrt{D'}\), the cost of a call by \(D'/g'\).
+
+\subsection{The reduction}
+
+\begin{theorem}[Theorem~17 at the true middle size]\label{thm:mid}
+There is a constant \(C\) with the following property.  Let \(T(n,D,w)\) bound
+the time of a solver of \(\LopTri(n,D)\) with \(w\) query pairs.  Then Exact
+Triangle on \(n\) vertices per part with weights of absolute value at most
+\(n^{\nu}\), \(\nu\ge1\), is solved in time at most
+\[
+  4ng'\Bigl(T\bigl(n,\operatorname{mid}(D',g'),\lfloor n^{2}/\sqrt{D'}\rfloor\bigr)
+     +C\frac{n^{2}}{\sqrt{D'}}\Bigr)
+  +C\Bigl(\frac{\nu n^{3}\log n}{g'}+n^{\log_2 7}D'^{3/2}+n^{2}D'g'\Bigr)
+\]
+whenever \(16\le D'\le n\) and \(1\le g'\le\sqrt{D'}\).
+\end{theorem}
+
+This is a statement about programs: the solver is a procedure of a program of
+the machine, and the theorem gives a program for Exact Triangle.  The exponent
+\(\log_2 7\) is that of Strassen's algorithm \cite{Str69}, which the upstream
+program uses for the choice of the prime; see Section~\ref{sec:limits}.
+
+In Lean the statement is \lean{Claim17Mid}, the upstream statement
+\lean{Claim.Theorem_17} with \(\operatorname{mid}(D',g')\) (\lean{midSize}) in
+place of \(D'\) in the first argument of \(T\).  The host is upstream's with one
+added assignment (\lean{et17Sizes'}): after the prime and the size of a piece
+are computed, the parameter that is passed to the solver is overwritten with
+\(\lceil s/g'\rceil s\).  Its correctness and its time follow from upstream's by
+rewriting the arguments of the solver (\lean{hostTime'_eq},
+\lean{obeysBound17Mid_hostTime}); the claim for programs is
+\lean{claim17Mid_of_paramProcs}, and for \(D'=\lfloor n^{a/b}\rfloor\),
+\(g'=\lceil D'^{c/d}\rceil\) with rational exponents it is
+\lean{hostBound_mid_rat}.
+
+\subsection{The total time}
+
+\begin{theorem}[Total time]\label{thm:total}
+Let \(\gamma,q\ge0\) and \(\varepsilon>0\).  Suppose that \(\LopTri(n,D)\) with
+\(w\) query pairs is solved, for \(D\le n^{\varepsilon}\), in time
+\(O\bigl(n^{2}(\log D+1)^{2}/D^{\gamma}+w\,D^{q}(\log D+1)\bigr)\).  Let
+\(0<d\) and \(0<\eta<1/2\) be rational with \(d(1-\eta)<\varepsilon\), and let
+\(D'=\lfloor n^{d}\rfloor\), \(g'=\lceil D'^{\eta}\rceil\).  Then Exact Triangle
+with weights up to \(n^{\nu}\) is solved in time \(O(\nu\,n^{3-\delta}\log n)\)
+for every \(\delta\ge0\) with
+\begin{equation}\label{eq:total}
+  \delta<d\,\min\Bigl(\eta,\ \min\bigl(\gamma(1-\eta),\ \tfrac12-q(1-\eta)\bigr)-\eta\Bigr)
+  \qquad\text{and}\qquad \tfrac32d+\delta\le0.19 .
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+Apply Theorem~\ref{thm:mid}.  The dimension of a call is
+\(D=\operatorname{mid}(D',g')=\Theta(D'^{1-\eta})=\Theta(n^{d(1-\eta)})\), which
+is at most \(n^{\varepsilon}\) for large \(n\).  Up to constants and powers of
+\(\log n\), the terms are
+\begin{align*}
+  &\text{calls, preprocessing:} & n\,g'\,n^{2}D^{-\gamma}&=n^{3+d\eta-d\gamma(1-\eta)},\\
+  &\text{calls, queries:} & n\,g'\,\frac{n^{2}}{\sqrt{D'}}D^{q}&=n^{3+d\eta+dq(1-\eta)-d/2},\\
+  &\text{scans:} & \nu n^{3}/g'&=\nu n^{3-d\eta},\\
+  &\text{prime:} & n^{\log_2 7}D'^{3/2}&\le n^{2.81+3d/2},\\
+  &\text{construction:} & n^{2}D'g'&=n^{2+d+d\eta}.
+\end{align*}
+The first three exponents are at most \(3-\delta\) by the first condition of
+\eqref{eq:total}, with room for the logarithms, and so is that of the term
+\(ng'n^{2}/\sqrt{D'}\).  The last two are at most \(3-\delta\) by the second
+condition.
+\end{proof}
+
+In Lean: \lean{explicitFrom_mid}, from \lean{hostBound_mid_rat} and a solver
+of \(\LopTri\) (\lean{LopClaim}, obtained from a thin-product claim by
+\lean{lopClaim_of_thinClaim}).  The same calculation with every call charged at
+\(D'\), as in the paper, is \lean{explicitFrom_original}; its condition is
+\(\delta<d\min(\eta,\min(\gamma,\frac12-q)-\eta)\).
+
+\subsection{The saving of a tuple}
+
+It is convenient to take the dimension \(D\) of the calls as the basic
+parameter.  Write \(D\approx n^{\varepsilon}\) and
+\begin{equation}\label{eq:sigma}
+  \sigma=\frac{1}{2(1-\eta)}\in\bigl[\tfrac12,1\bigr),\qquad\text{so that}\qquad
+  D'=D^{2\sigma},\quad g'=D^{2\sigma-1},\quad\sqrt{D'}=D^{\sigma}.
+\end{equation}
+An instance then has inner dimension \(D\) and at most \(n^{2}/D^{\sigma}\)
+query pairs.  With the thin product of Section~\ref{sec:exact} at the
+parameters \((c,\theta)\) the exponent of a call is
+\(\min(\gX(c,\theta),\sigma-q(\theta))\), by \eqref{eq:cor32} with
+\(\kappa=\sigma\), and the first condition of \eqref{eq:total} reads
+\(\delta<\sav(c,\theta,\sigma,\varepsilon)\) with \(d(1-\eta)\) in the place of
+\(\varepsilon\), where:
+
+\begin{definition}\label{def:saving}
+The \emph{saving} of the tuple \((c,\theta,\sigma,\varepsilon)\) is
+\[
+  \sav(c,\theta,\sigma,\varepsilon)
+  =\varepsilon\,\min\Bigl(2\sigma-1,\ \min\bigl(\gX(c,\theta),\sigma-q(\theta)\bigr)-(2\sigma-1)\Bigr).
+\]
+\end{definition}
+
+In Lean: \lean{tupleSaving}, with \lean{effGamma} for the inner minimum.  The
+first argument of the outer minimum is the saving of the scans, the second
+that of the calls.  In the paper every call is charged at the dimension \(D'\); relative to
+\(D'\) the density of the query pairs is \(\kappa=1/2\).  Relative to the true
+dimension \(D\) it is \(\sigma>1/2\) as soon as \(g'>1\), and the thin product
+profits from both: a smaller inner dimension and, relative to it, fewer wanted
+entries.
+
+\begin{remark}[A larger hash prime]\label{rem:prime}
+The same algorithm can be described without \(g'\).  Hash modulo a prime
+\(p\approx D^{\sigma}\) with \(\sigma\ge1/2\), and cut each part into pieces of
+\(D^{1-\sigma}\) vertices, so that a middle part \(C_k\times\Z_p\) has \(D\)
+vertices.  There are \(O(nD^{2\sigma-1})\) instances with at most
+\(n^{2}/D^{\sigma}\) query pairs each, and the scans cost
+\(\nu n^{3}\log n/D^{2\sigma-1}\).  This is the reduction above with
+\(D'=D^{2\sigma}\) and \(g'=D^{2\sigma-1}\): a larger prime and no further
+splitting.  The balance of Remark~20 of the paper, \(\eta=\gamma/2\), becomes
+the fixed point \(\sigma=1/2+\gamma/4\) of Section~\ref{sec:optimum}.
+\end{remark}

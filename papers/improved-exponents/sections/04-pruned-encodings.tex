@@ -1,0 +1,280 @@
+\section{Pruned encodings}
+\label{sec:pruned}
+
+The second summand of \eqref{eq:cost8} pays for the encodings of the input at
+all \(10^{L}\) leaves.  Most of them are never read.  This section computes
+only those that are.  First the mathematics: the correctness of the pruned
+recursion, its number of operations, and the resulting cost of the method
+(Theorem~\ref{thm:pruned}, Proposition~\ref{prop:costP}).  Then the program:
+the pruned encoder is written in the language of \cite{upstream}, the
+procedures of the paper's data structure are re-verified under the weaker
+contract that the encodings are right only at the leaves that are read, and
+the running time of the new solver is proved on the machine
+(Theorem~\ref{thm:encoder}).  Everything is machine-checked.
+
+\subsection{What is read and what is nonzero}
+
+Let \(a\) be the array of a band.  It is indexed by the \emph{left strings}:
+strings \(u=u_1\cdots u_L\) of left variables.  For a leaf
+\(\tau=\tau_1\cdots\tau_L\) the encoding is
+\[
+  \Phi_\tau(a)=\sum_u a[u]\prod_{\ell=1}^{L}\varphi_{\tau_\ell}(u_\ell),
+\]
+where \(\varphi_\tau\) is the linear form of the term \(\tau\) in the left
+variables.  Each \(\varphi_\tau\) has at most three nonzero coefficients.  Two
+facts hold in the recursion.
+\begin{itemize}
+\item Only leaves with at most \(m\) symbols \(\Pz\) are read: the leaves of
+  \(\Leaves(U)\) have order at least \(0\).
+\item \(a[u]=0\) unless \(u\) has exactly \(m\) inner variables.
+\end{itemize}
+
+Yates' algorithm computes the encodings level by level.  Stage \(k\) holds
+\[
+  A_k[\tau_1\cdots\tau_k;u_{k+1}\cdots u_L]
+  =\sum_{u_1,\dots,u_k}a[u]\prod_{\ell\le k}\varphi_{\tau_\ell}(u_\ell),
+\]
+so \(A_0=a\) and \(A_L[\tau]=\Phi_\tau(a)\), and
+\(A_{k+1}[\tau_1\cdots\tau_{k+1};\cdot]
+=\sum_v\varphi_{\tau_{k+1}}(v)A_k[\tau_1\cdots\tau_k;v\,\cdot]\).
+
+\begin{definition}\label{def:pruned}
+Let \(P_k\) be the set of strings of \(k\) terms with at most \(m\) symbols
+\(\Pz\), and \(U_k\) the set of strings of \(L-k\) left variables with at most
+\(m\) inner variables.  The \emph{pruned recursion} computes at stage \(k\)
+only the entries of \(A_k\) with index in \(P_k\times U_k\), by the rule above,
+and treats all other entries as \(0\).
+\end{definition}
+
+\subsection{Correctness and cost}
+
+\begin{theorem}[Pruned encodings]\label{thm:pruned}
+Let \(L\ge10m\), and let \(a\) vanish off the left strings with exactly \(m\)
+inner variables.
+\begin{enumerate}
+\item The pruned recursion computes \(\Phi_\tau(a)\) for every leaf \(\tau\)
+  with at most \(m\) symbols \(\Pz\).
+\item \(|P_k|=\sum_{j\le m}\binomial kj9^{k-j}\) and
+  \(|U_k|=\sum_{i\le m}\binomial{L-k}{i}4^{i}3^{L-k-i}\).
+\item \(\sum_{k=0}^{L}|P_k|\,|U_k|\le\frac92|P_L|\le\frac92\cdot\frac{M}{1-\rho}\)
+  with \(\rho=9m/(L-m+1)\).
+\item Every computed entry is a sum of at most three products.  So the pruned
+  recursion makes at most \(\frac{27}{2}M/(1-\rho)\) multiplications.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(i) An entry of \(A_k\) whose suffix has more than \(m\) inner variables is
+\(0\): every \(u\) in its sum has more than \(m\) inner variables, so
+\(a[u]=0\).  An entry of \(A_{k+1}\) with prefix in \(P_{k+1}\) reads entries of
+\(A_k\) whose prefix is in \(P_k\), since deleting a term does not add a
+symbol \(\Pz\).  So, by induction on \(k\), the pruned arrays agree with those
+of Yates' algorithm at every index whose prefix has at most \(m\) symbols
+\(\Pz\): such an entry is \(0\) if its suffix is outside \(U_k\), and otherwise
+each entry it reads either lies in \(P_{k-1}\times U_{k-1}\) or is \(0\) in both
+arrays.
+
+(ii) There are nine terms other than \(\Pz\), and four inner and three outer
+left variables.
+
+(iii) Since \(\binomial{k+1}{j}\ge\binomial kj\), we have
+\(|P_{k+1}|\ge9|P_k|\).  By Pascal's rule,
+\[
+  \sum_{i\le m}\binomial{n+1}{i}4^{i}3^{n+1-i}
+  =3\sum_{i\le m}\binomial ni4^{i}3^{n-i}
+   +4\sum_{i\le m-1}\binomial ni4^{i}3^{n-i},
+\]
+so \(|U_k|\le7|U_{k+1}|\).  With \(|U_L|=1\) this gives
+\(|P_k||U_k|\le(7/9)^{L-k}|P_L|\), and \(\sum_{k}(7/9)^{L-k}\le9/2\).  The terms
+of \(|P_L|=\sum_{j\le m}\binomial Lj9^{L-j}\) have consecutive ratios
+\(\binomial L{j-1}9/\binomial Lj=9j/(L-j+1)\le\rho<1\), and the term with
+\(j=m\) is \(M\).  So \(|P_L|\le M/(1-\rho)\).
+
+(iv) follows from (iii) and the three coefficients of a form.
+\end{proof}
+
+In Lean (directory \lean{PrunedEncoding}): Yates' algorithm is
+\lean{yatesStage} with \lean{yatesStage_final}; the pruned recursion is
+\lean{prunedStage}; part~(i) is \lean{prunedStage_eq_yatesStage} and
+\lean{prunedStage_final}; part~(ii) is \lean{card_stageSet_of_le} with
+\lean{prefCount} and \lean{sufCount}; part~(iii) is
+\lean{sum_card_stageSet_le}; part~(iv) is \lean{prunedMults_le_M}; the theorem
+as a whole is \lean{pruned_encoding}.
+
+\begin{remark}\label{rem:PL}
+\(|P_L|=\sum_{d=0}^{m}\beta_d\): the pruned recursion computes exactly the
+encodings at the leaves of order at least \(0\).  For \(L\ge cm\) with \(c>10\)
+fixed, \(1/(1-\rho)\le(c-1)/(c-10)\).
+\end{remark}
+
+\begin{remark}[The work of the program]\label{rem:encwork}
+The program of Section~\ref{sec:encoder-program} below follows the recursion
+of Theorem~\ref{thm:pruned} with one simplification: at stage \(k\) it keeps
+the entries with index in \(P_k\times(\text{all \(7^{L-k}\) suffixes})\)
+instead of \(P_k\times U_k\), so that the suffixes are indexed densely and no
+compact indexing of \(U_k\) is needed.  For \(L\ge10m\) the largest slice,
+with \(7^{L}\) entries, is no larger than a tile: \(7^{L}\le9^{L-m}\le M\)
+(\lean{seven_pow_le_M}).  The number of computed entries, \lean{encWorkP}~\(L\,m\)
+in Lean, is
+\[
+  \sum_{k=0}^{L}|P_k|\,7^{L-k}\le\frac92|P_L|
+  \le\frac92\cdot\frac{M}{1-\rho},
+\]
+from \(9|P_k|\le|P_{k+1}|\) and \(\sum_i(7/9)^i\le9/2\)
+(\lean{encWorkP_le}, \lean{encWorkP_le_M_div}): part~(iii) with \(7^{L-k}\)
+in place of \(|U_k|\), and the same bound.  The time of the program is at most
+\(\EncConst\) times this number (\lean{tEncP_le}).
+\end{remark}
+
+\subsection{The thinness bound}
+
+With \(O(L)\) word operations per entry for the index arithmetic, a band costs
+\(O(LM)\) instead of \(O(L\,10^{L})\), and all \(N/(\sqrt K N_0)\) bands cost
+\(O(L\,N\sqrt K N_0)\), since \(M=KN_0^{2}\).  This is at most
+\(N^{2}/D^{\gamma}\) up to the factor \(L\) when \(\sqrt K N_0D^{\gamma}\le N\).
+So the thinness condition \eqref{eq:Rc} becomes
+\begin{equation}\label{eq:RcP}
+  \varepsilon<\RcP(\gamma):=\frac{\ln 4}{\Apr(c)+\gamma\ln 4},\qquad
+  \Apr(c)=\frac c2\Hent\Bigl(\frac1c\Bigr)+(c-1)\ln 3 ,
+\end{equation}
+where \(\Apr(c)\) is the exponential rate of \(\sqrt K N_0\) per inner level.
+Since \(M\le10^{L}\), we have \(\Apr(c)\le\Afull(c)\) and
+\(\RcP(\gamma)\ge\Rc(\gamma)\).  In Lean the constants are \lean{basePruned} and
+\lean{baseFull}, the bound is \lean{RcP}, and the two inequalities are
+\lean{basePruned_le_baseFull} and \lean{Rc_le_RcP}.
+
+\begin{proposition}[The costs with pruned encodings]\label{prop:costP}
+Let \(c>10\), \(0<\theta<0.9\), \(0\le\gamma<\gX(c,\theta)\) and
+\(0<\varepsilon<\RcP(\gamma)\).  There are \(C\) and \(m_0\) such that the
+following holds for all \(D\ge2\) and \(N\) with \(D\le N^{\varepsilon}\) and
+\(m=\lceil\log_4 D\rceil\ge m_0\), with \(L=\lceil cm\rceil\) and
+\(t=\lceil\theta m\rceil\).
+\begin{enumerate}
+\item The tile fits: \(\sqrt K N_0\le N\).
+\item The cost of the preprocessing with pruned encodings,
+  \[
+    L\,m\,\frac{\sum_{d=t}^{m}\beta_d}{M}\,N^{2}
+    +\frac{N}{\sqrt K N_0}\cdot L\cdot\frac{27}{2}\cdot\frac{M}{1-\rho},
+  \]
+  is at most \(C\,N^{2}\log^{2}D/D^{\gamma}\).
+\item The cost \(L\sum_{d\le t}\alpha_d\) of a query is at most
+  \(C\,D^{q(\theta)}\log D\).
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+The first summand of (ii) is bounded as in Section~\ref{sec:exact}.  The second
+is \(\frac{27}{2}NL\sqrt K N_0/(1-\rho)\).  Now
+\(\sqrt K N_0\le e^{m\Apr(L/m)}\), the ratio \(L/m\) tends to \(c\), and
+\(N\ge D^{1/\varepsilon}>4^{(m-1)/\varepsilon}\); so
+\(D^{\gamma}L\sqrt K N_0\le N\) for all large \(m\), because
+\(\Apr(c)+\gamma\ln 4<\ln 4/\varepsilon\).  This gives (i) and (ii).  Part~(iii)
+is as in the paper.
+\end{proof}
+
+In Lean (file \lean{PrunedEncoding/Costs.lean}): the expression of (ii) is
+\lean{cost8P}, the inequality \(D^{\gamma}L\sqrt K N_0\le N\) is \lean{eq_10P},
+and the proposition is \lean{costsP}.  It is the analogue of the statement
+\lean{costsX} on which Theorem~\ref{thm:offline} rests, with the pruned
+encoder's count of operations in place of \(10^{L}\) and \(\RcP\) in place of
+\(\Rc\).
+
+\begin{theorem}[The encoder program]\label{thm:encoder}
+For all rational \(c=a/b>10\) and \(\theta=p/q\in(0,0.9)\), every
+\(0<\gamma<\gX(c,\theta)\) and every \(\varepsilon<\RcP(\gamma)\), there is a
+procedure, in the programming language of \cite{upstream}, that solves the thin
+product on all instances and takes at most a constant times
+\[
+  \frac{N^{2}(\log D+1)^{2}}{D^{\gamma}}+w\,D^{q(\theta)}(\log D+1)
+\]
+steps on every instance with \(1\le D\le N^{\varepsilon}\) and at most \(w\)
+wanted positions.
+\end{theorem}
+
+Theorem~\ref{thm:encoder} is the conclusion of Theorem~\ref{thm:offline} with
+\(\RcP\) in place of \(\Rc\).  On paper it follows from
+Theorem~\ref{thm:pruned} and Proposition~\ref{prop:costP}: replace the encoder
+of the offline routine by the pruned recursion, and replace the regime test of
+the program, which is tied to \(\varepsilon\le1/18\), by the test with a
+rational exponent of Section~\ref{sec:regime}.  In Lean the statement is the
+proposition \lean{PrunedEncoderClaim} (file \lean{Pipeline/General.lean}),
+proved as \lean{prunedEncoderClaim} (file \lean{Pipeline/PrunedClaim.lean}).
+It is stated with the same notion, \lean{ThinClaim}, in which
+Theorems~\ref{thm:T3} and~\ref{thm:T4} obtain the thin product from the
+existing program (\lean{thinClaim_gammaX}, \lean{thinClaimRS_gammaX}): a claim
+about the time model
+\lean{lightModel} of the upstream programs, which \cite{upstream} compiles to
+the word RAM.  The rest of this section describes the program and its proof.
+
+\subsection{The encoder program}
+\label{sec:encoder-program}
+
+\emph{The encoder.}  Upstream's encoder is a recursive procedure
+\lean{encodeBody} that descends the ten terms of the identity level by level and
+fills the \(10^{L}\) encodings of a band.  The pruned encoder
+(\lean{encodePBody}, file \lean{PrunedProgram/Encode/Recursion.lean}) is the
+same procedure with a budget \(j\) of symbols \(\Pz\): a loop over the nine
+terms \(\lambda\ne\Pz\) recurses with the same budget, and the term \(\Pz\)
+(digit~\(9\)) is treated after the loop, only if the budget is nonzero, with
+budget \(j-1\).  The last term is treated outside the loop because the
+language's \texttt{for} charges every round the same time.  The slices are the
+dense ones of Remark~\ref{rem:encwork}.  Its correctness is \lean{encodeP_spec}:
+after the call with budget \(j\), every leaf with at most \(j\) symbols \(\Pz\)
+holds its encoding (the postcondition \lean{EncodePostP}), and its time is at
+most \(\EncConst\) times the work \lean{encWorkP}~\(L\,j\) (\lean{tEncP_le}),
+which Remark~\ref{rem:encwork} bounds by
+\(\frac92\cdot\EncConst\cdot M/(1-\rho)\) for \(j=m\).
+
+\emph{The weaker contract.}  Upstream's data structure assumes that the
+encodings of a band are right at all \(10^{L}\) leaves (a \emph{segment}).
+With the pruned encoder they are right only at the leaves with at most \(m\)
+symbols \(\Pz\); this is the predicate \lean{SegOn} (file
+\lean{PrunedProgram/SegOn.lean}).  The preprocessing and the query of
+Theorem~30 of the paper read an encoding cell in exactly two places, both at
+such leaves: in the construction of the trie, at the leaf of a code of
+\lean{nineStrs}, which has at most \(m-t\) digits~\(9\); and in a query, at a
+leaf that contributes to the output string, which has the symbol \(\Pz\) only
+at inner levels (\lean{P0Levels_subset_innerSetO},
+\lean{card_P0Levels_le_of_contributes}).  So upstream's own procedures for the
+tiles (\lean{fillListBody}, \lean{tileBody}, \lean{allTilesBody}) and for a query
+(\lean{queryAtBody}) are re-verified under the weaker contract, with their program
+text unchanged: \lean{fillListP_meets} and \lean{preCoreP_of_base58} (files
+\lean{PrunedProgram/Tiles}, \lean{PrunedProgram/Pre/Preprocessing.lean}),
+\lean{queryCoreP_spec} and \lean{queryAtP_of_base58} (directory
+\lean{PrunedProgram/Query}).  Upstream's shared stage, which builds the
+tables and encodes every band, becomes \lean{sharedPBody} with the entry
+\lean{sharedP_entry} (file \lean{PrunedProgram/Shared/Stage.lean}): its two
+calls of the encoder are exchanged for calls of the pruned one, and nothing
+else changes.  The invariant of the finished data structure is \lean{DSReadyP}
+(file \lean{PrunedProgram/Pre/Defs.lean}).
+
+\emph{The program.}  The routines with rational parameters are
+\lean{pre31PBody}, \lean{offline32PBody} and \lean{offline32P_meets}
+(directory \lean{PrunedProgram/Wrapper}).  The program is \lean{programP}: the
+program \lean{programRS} of Section~\ref{sec:regime} followed by seven
+procedures, \lean{encodeP}, \lean{encodeBandsP}, \lean{sharedP},
+\lean{preCoreP}, \lean{pre31P}, \lean{offline32P} and \lean{allP}; every other
+procedure is upstream's, with its number.  The offline routine as an object of
+the pipeline is \lean{offline32PRoutine}.
+
+\emph{The cost.}  The running time is analyzed against \lean{cost8P} as the
+running time of upstream's program is analyzed against \lean{cost8X} in
+Theorem~\ref{thm:offline}: \lean{Within8P} and \lean{exists_tPreCore_leP},
+\lean{CostsWithinP} and \lean{offlineWithinP} (directory \lean{Cost8P}) are
+the analogues of \lean{exists_tPreCore_leX}, \lean{costsX} and
+\lean{offlineWithinX}.  The small summands of the shared stage are bounded by
+\(NL\sqrt K N_0\) directly, since \lean{cost8P} has no term \(10^{L}\).
+
+\emph{The pipeline.}  The solver of all instances is generic in the offline
+routine: the structure \lean{OfflineRoutine} (file
+\lean{Pipeline/ThinClaim.lean}) packages the procedure, its time, what it
+needs from the program and its specification, as the regime test is already
+packaged as \lean{RegimeTest}.  Upstream's routine is the instance
+\lean{offline32Routine} and the pruned one is \lean{offline32PRoutine};
+\lean{thinClaimRS_of_offlineWithinT} (file \lean{Pipeline/RegimeRS.lean})
+turns either into a thin-product claim at the regime \(D^{r}\le N^{s}\).  For
+\lean{thinClaimP_gammaX} and \lean{prunedEncoderClaim} the fraction \(r/s\) is
+chosen strictly between \(\Apr(c)/\ln 4\) and \(1/\varepsilon\), which is
+possible because \(\varepsilon<\RcP(\gamma)<\ln 4/\Apr(c)\); the case
+\(\varepsilon\le0\) of the statement is reduced to a positive \(\varepsilon\)
+by \lean{ThinClaim.mono}.

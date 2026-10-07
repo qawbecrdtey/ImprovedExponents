@@ -1,0 +1,96 @@
+%% The numerals of the paper, one macro each.  They may still change while the
+%% formalization is being completed; change them here and nowhere else.
+
+%% ---------------------------------------------------------- the original paper
+\newcommand{\ETpaper}{0.00175}            % saving for Exact Triangle (Thm 19)
+\newcommand{\ETexpPaper}{2.9983}          % as printed: 3 - eps_T, eps_T = 0.0017
+\newcommand{\ThreeSumPaper}{1.999125}     % 2 - \ETpaper/2
+\newcommand{\ThreeSumPaperStated}{1.9992} % as printed in Theorem 22
+\newcommand{\APSPpaper}{2.99942}          % 3 - \ETpaper/3, as printed
+
+%% --------------------------------- T2: the paper's exponents, better parameters
+\newcommand{\dTwo}{0.00184}
+\newcommand{\ThreeSumTwo}{1.99908}
+\newcommand{\ETTwo}{2.99816}
+\newcommand{\APSPTwo}{2.99939}
+
+%% ------------------------------------------------------------ T3: + exact count
+\newcommand{\dThree}{0.00196}
+\newcommand{\ThreeSumThree}{1.99902}
+\newcommand{\ETThree}{2.99804}
+\newcommand{\APSPThree}{2.99935}
+
+%% ------------------------------------------------------ T4: + true middle size
+\newcommand{\dFour}{0.00205}
+\newcommand{\ThreeSumFour}{1.99898}
+\newcommand{\ETFour}{2.99795}
+\newcommand{\APSPFour}{2.99932}
+
+%% --------------------------------------------- T1: + pruned encodings
+\newcommand{\dOne}{0.002095}
+\newcommand{\ThreeSumOne}{1.99896}
+\newcommand{\ETOne}{2.99791}
+\newcommand{\APSPOne}{2.99931}
+\newcommand{\APSPFn}{2.99795}             % (min,+), APSP through all-edges ET, no hypothesis
+\newcommand{\APSPFnOne}{2.99791}          % the same with pruned encodings (T1)
+
+%% ----------------------------------------------------------------- the optimum
+\newcommand{\SstarLo}{0.002095}           % lower bound for sup_c S(c), pruned
+\newcommand{\SstarHi}{0.002096}           % upper bound for sup_c S(c), pruned
+\newcommand{\cStarLo}{21}                 % S(c) >= \SstarLo only for c in
+\newcommand{\cStarHi}{23}                 %   (\cStarLo, \cStarHi)
+\newcommand{\cUncond}{108/5}              % ratio c of Theorems T2, T3
+\newcommand{\cUncondOpt}{107/5}           % ratio c of Theorem T4
+\newcommand{\cCond}{22}                   % ratio c of Theorem T1 (pruned encodings)
+\newcommand{\SfullLo}{0.002059}           % lower bound for sup_c S(c), paper's encodings
+\newcommand{\SfullHi}{0.002061}           % upper bound for sup_c S(c), paper's encodings
+\newcommand{\cFullLo}{20.8}               % S_full(c) >= \SfullLo only for c in
+\newcommand{\cFullHi}{22}                 %   (\cFullLo, \cFullHi)
+
+%% approximate optimum with pruned encodings (not certified)
+\newcommand{\SprApprox}{0.0020953}
+\newcommand{\cPrApprox}{21.92}
+\newcommand{\GamPrApprox}{0.0759}
+\newcommand{\sigmaPrApprox}{0.519}
+\newcommand{\epsPrApprox}{0.0552}
+\newcommand{\thetaPrApprox}{0.116}
+%% approximate optimum with the paper's encodings (not certified)
+\newcommand{\SfullApprox}{0.0020599}
+\newcommand{\cFullApprox}{21.38}
+\newcommand{\cFitsMax}{21.86}             % the tile fits for c below this
+\newcommand{\cFullMin}{21.49}             % A_full(c) >= 18 ln 4 for c above this
+
+%% parameters of Theorem T1 at c = \cCond
+\newcommand{\GamCond}{0.0762}
+\newcommand{\sigmaCond}{0.519}
+\newcommand{\epsCond}{0.05498}
+\newcommand{\thetaCond}{0.116}
+
+%% ------------------------------------------------------------ the Lean sources
+\newcommand{\LeanFiles}{179}              % files of Lean in ImprovedExponents/
+\newcommand{\LeanLines}{46\,416}          % lines of Lean in ImprovedExponents/
+\newcommand{\LeanCellLines}{26\,822}      % of which generated (GlobalCells*, GlobalFullCells*, Shapes/Cells_*)
+\newcommand{\LeanHandLines}{19\,600}      % hand-written, about
+\newcommand{\LeanExactCountLines}{763}    % lines of ImprovedExponents/ExactCount/
+\newcommand{\LeanPipelineLines}{2337}     % lines of ImprovedExponents/Pipeline/
+\newcommand{\LeanOptimumLines}{29\,754}   % lines of ImprovedExponents/Optimum/
+\newcommand{\LeanGlobalCellLines}{4703}   % of which GlobalCells*, GlobalFullCells*
+\newcommand{\LeanShapesHandLines}{1038}   % hand-written lines of Optimum/Shapes/
+\newcommand{\LeanShapesCellLines}{22\,119} % generated lines of Optimum/Shapes/Cells_*
+\newcommand{\LeanShapesCells}{2253}       % certified cells of the nine shapes
+\newcommand{\LeanShapesCellFiles}{53}     % files holding them
+\newcommand{\LeanPaperAccountingLines}{269} % lines of Optimum/PaperAccounting.lean
+\newcommand{\LeanPrunedProgramLines}{3951} % lines of ImprovedExponents/PrunedProgram/
+\newcommand{\LeanCostEightPLines}{718}    % lines of ImprovedExponents/Cost8P/
+\newcommand{\LeanStatementsLines}{396}    % lines of Statements.lean
+\newcommand{\LeanAllEdgesLines}{3558}    % lines of ImprovedExponents/AllEdges/
+\newcommand{\LeanCostEightXLines}{727}    % lines of ImprovedExponents/Cost8X/
+\newcommand{\LeanPrunedEncodingLines}{1330} % lines of ImprovedExponents/PrunedEncoding/
+\newcommand{\LeanHostMidLines}{1008}      % lines of ImprovedExponents/HostMid/
+\newcommand{\LeanParamRoutinesLines}{645} % lines of ImprovedExponents/ParamRoutines/
+\newcommand{\LeanTotalLines}{806}         % lines of ImprovedExponents/Total/
+\newcommand{\LeanMinPlusLines}{400}       % lines of ImprovedExponents/MinPlus/
+\newcommand{\LeanVersion}{v4.33.1}        % Lean and Mathlib of this project (lean-toolchain), as upstream
+\newcommand{\ComparatorDate}{2026-10-07}  % the day Comparator accepted comparator.json (scripts/comparator-run.log)
+\newcommand{\UpstreamRev}{e1a4e65}        % revision of the upstream repository
+\newcommand{\EncConst}{778}               % the constant of tEncP_le

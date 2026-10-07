@@ -1,0 +1,16 @@
+/.lake
+/.cache
+__pycache__/
+/search/.venv/
+
+# A local copy of the paper of Alman and Vassilevska Williams (arXiv:2610.06783); not distributed.
+/subquadratic_3sum.pdf
+
+# LaTeX build products
+papers/*/*.aux
+papers/*/*.bbl
+papers/*/*.blg
+papers/*/*.log
+papers/*/*.out
+papers/*/*.toc
+papers/*/*.synctex.gz

@@ -1,0 +1,13 @@
+{
+  "challenge_module": "ImprovedChallenge",
+  "solution_module": "ImprovedSolution",
+  "theorem_names": [
+    "ImprovedExponents.threeSum_pruned",
+    "ImprovedExponents.exactTriangle_pruned",
+    "ImprovedExponents.minPlus_allEdges_pruned",
+    "ImprovedExponents.apsp_allEdges_pruned"
+  ],
+  "definition_names": [],
+  "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"],
+  "enable_nanoda": true
+}

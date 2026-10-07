@@ -1,0 +1,155 @@
+\section{Limits of the method}
+\label{sec:limits}
+
+The saving \(\SstarLo\) is the end of what the parameters give.  This section
+records why the base identity cannot be exchanged for a better one of the same
+kind, and what would have to change.  The comparison of the shapes of
+Sch\"onhage's family is certified (Proposition~\ref{prop:shapes}): it is a
+statement about the saving formula of Sections~\ref{sec:exact}
+to~\ref{sec:optimum} evaluated for other shapes, since the programs exist for
+the shape of the paper only.  The rest of the section, the mixtures, the
+hypothetical shapes, the experiments and the remark on \(\omega\), is \nf; its
+numbers are computed in floating point by the scripts in the directory
+\texttt{search} of the repository.
+
+\subsection{The family of Sch\"onhage}
+
+For \(k,n\ge2\), Sch\"onhage's identity for
+\(\schon k1n\oplus\schon1{(k-1)(n-1)}1\) has \(kn+1\) terms \cite{Sch81}.  It
+has \(s=kn\) outer outputs with one term each, and one shared term for an
+inner product of length \(b=(k-1)(n-1)\).  The paper uses \(k=n=3\): \(s=9\),
+\(b=4\), ten terms.  The analysis of Sections~\ref{sec:exact}
+to~\ref{sec:optimum} is written for this shape.  For another member of the
+family it would be repeated with the corresponding counts of terms, variables
+and leaves, an asymmetric shape being used together with its transpose so that
+tiles stay square; we do not write the programs for other shapes, and what
+follows is the saving formula of Theorem~\ref{thm:sup} evaluated for them.
+With \(s\) outer outputs and inner length \(b\) one has \(D=b^{m}\),
+\(N_0=\sqrt s^{\,L-m}\),
+\(\gtwo\) with \(\delta\ln s\) in place of \(\delta\ln 9\), \(\gX\) and \(q\)
+with \(\ln b\) in place of \(\ln 4\), the window \((0,s/(s+1))\) for \(\theta\)
+in place of \((0,0.9)\), and the thinness constant
+\(\Apr(c)=\frac c2\Hent(\frac1c)+(c-1)\frac{\ln s}2\); the saving at the ratio
+\(c>s+1\) is then \(S(c)=F_{\Apr(c)}(\Gam(c))\) as in Theorem~\ref{thm:sup}.
+In Lean (directory \lean{Optimum/Shapes}): \lean{g2S}, \lean{gammaXS},
+\lean{qS}, \lean{gammaQS}, \lean{GamS}, \lean{thinRS}, \lean{savingS},
+\lean{basePrunedS} and the saving \lean{shapeSaving}~\(s\,b\,c\); for
+\((s,b)=(9,4)\) they reduce to the functions of Sections~\ref{sec:exact}
+to~\ref{sec:optimum} (\lean{shapeSaving_nine_four}, from \lean{g2S_nine},
+\lean{gammaXS_nine_four}, \lean{qS_nine_four}, \lean{GamS_nine_four} and
+\lean{basePrunedS_nine}).  Lemma~\ref{lem:crossing} and the monotonicity of
+\(\Apr\) carry over under \(2\le b<(s+1)^{2}\) and \(c>s+1\)
+(\lean{GamS_pos}, \lean{GamS_lt_two_thirds}, \lean{GamS_monotoneOn},
+\lean{basePrunedS_monotoneOn}).  Table~\ref{tab:family} gives the optimum for
+each shape, with pruned encodings and the prime at its fixed point.
+
+\begin{table}[ht]
+\centering\small
+\setlength{\tabcolsep}{4.5pt}
+\begin{tabular}{lrrlrrr}
+\toprule
+shape \((k,n)\) & \(s\) & \(b\) & \(\sup_{c}S(c)\) (certified)
+  & best \(c\) & \(\Gam\) & \(\varepsilon\)\\
+\midrule
+\((3,3)\) & 9 & 4 & \((\SstarLo,\SstarHi]\) & 21.92 & 0.0759 & 0.0552\\
+\((2,4)\) & 8 & 3 & \((0.001875,0.001877]\) & 20.11 & 0.0749 & 0.0501\\
+\((3,4)\) & 12 & 6 & \((0.001867,0.001869]\) & 27.96 & 0.0746 & 0.0501\\
+\((2,5)\) & 10 & 4 & \((0.001776,0.001778]\) & 24.24 & 0.0742 & 0.0479\\
+\((2,3)\) & 6 & 2 & \((0.001669,0.001671]\) & 16.03 & 0.0742 & 0.0450\\
+\((2,6)\) & 12 & 5 & \((0.001623,0.001625]\) & 28.39 & 0.0733 & 0.0443\\
+\((3,5)\) & 15 & 8 & \((0.001613,0.001615]\) & 34.04 & 0.0732 & 0.0441\\
+\((4,4)\) & 16 & 9 & \((0.001573,0.001575]\) & 35.96 & 0.0729 & 0.0432\\
+\((4,5)\) & 20 & 12 & \((0.001323,0.001325]\) & 44.01 & 0.0714 & 0.0371\\
+\((5,5)\) & 25 & 16 & \((0.001098,0.0011]\) & 54.02 & 0.0698 & 0.0315\\
+\bottomrule
+\end{tabular}
+\caption{The saving for Exact Triangle with Sch\"onhage's identity of shape
+\((k,n)\) and pruned encodings.  The enclosures of the suprema over the ratio
+\(c>s+1\) are certified in Lean (Proposition~\ref{prop:shapes};
+Theorem~\ref{thm:global} for \((3,3)\)).  The last three columns, the ratio at
+which the supremum is approached and the parameters there, are computed in
+floating point and are not certified.}
+\label{tab:family}
+\end{table}
+
+\begin{proposition}[The family of Sch\"onhage]\label{prop:shapes}
+For each of the nine shapes of Table~\ref{tab:family} other than \((3,3)\),
+the supremum over \(c>s+1\) of the saving \(S(c)\) of the shape lies in the
+interval given in the table; in particular it is below \(0.00188\).  For
+\((3,3)\) the saving exceeds \(\SstarLo\) at \(c=\cCond\).
+\end{proposition}
+
+\begin{proof}
+As for Theorem~\ref{thm:global}, shape by shape: a lower bound is the value at
+one rational ratio, and the upper bound is certified on cells covering
+\((s+1,c_{\max}]\), with \(c_{\max}\) between \(200\) and \(600\), and beyond
+\(c_{\max}\) by \(\Gam(c)<2/3\) and the monotonicity of \(\Apr\); the cells are
+finest on the window around the maximum, which is \([19.6,20.6]\) for
+\((2,4)\) and \([52.1,56.1]\) for \((5,5)\).
+\end{proof}
+
+In Lean: \lean{shapes_table} collects the nine upper bounds and the value for
+\((3,3)\); the enclosures are \lean{sSup_shapeSaving_S24_mem} and its
+analogues for the other shapes, from the per-shape bounds
+\lean{shapeSaving_S24_lt} and \lean{shapeSaving_S24_gt}.  The
+\LeanShapesCells{} cells, in \LeanShapesCellFiles{} generated files
+\lean{Optimum/Shapes/Cells_S24_1.lean} and so on, are produced by
+\texttt{search/certs.py} with the option \texttt{--encoding shapes} and
+checked by Lean's kernel as in Theorem~\ref{thm:global}.
+
+The shape \((3,3)\) is the best.  The exponent \(\Gam\) hardly varies over the
+family, and \((3,3)\) also has the largest \(\varepsilon\).  For the same
+reason mixtures do not help (\nf): when two shapes are used on different
+levels, the optimizer drives the share of the second shape to zero, because no
+trade-off between \(\Gam\) and \(\varepsilon\) is available.
+
+\subsection{Hypothetical shapes}
+
+This subsection is \nf; its numbers are floating point.  One can ask what an identity with \(s\) outer outputs, one term each, and a
+shared term of inner length \(b\) would give, whether or not it exists.  The
+saving grows with \(b\) and falls with \(s\).  For \(s=9\) it is \(0.00210\)
+at \(b=4\), \(0.00254\) at \(b=5\) and \(0.00293\) at \(b=6\); for \(s=8\) it is
+\(0.00188\) at \(b=3\) and \(0.00252\) at \(b=4\).  In the computed grid (\(5\le s\le12\), \(3\le b\le8\)) every cell with a
+larger saving than \((s,b)=(9,4)\) is outside the class of Sch\"onhage's
+construction: an identity of this kind with \(s=kn\) satisfies the pairing
+bound \(b\le(k-1)(n-1)\), so \(s=9\) allows \(b\le4\), \(s=8=2\cdot4\) allows
+\(b\le3\), \(s=6\) allows \(b\le2\), \(s=10\) allows \(b\le4\), \(s=12\) allows
+\(b\le6\), and \(s=5,7\) have no factorization.  So within the class of
+identities with one term per outer output, the identity of the paper is optimal
+for this method.  Even the realistic cells beyond the bound
+(\(s\in\{8,9\}\), \(b\in\{4,5\}\)) give savings of only \(0.0025\) to
+\(0.0031\), that is, 3SUM in about \(n^{1.9985}\).
+
+\subsection{Experiments on the arrangement of the wanted set}
+
+This subsection is \nf.  The bound \eqref{eq:lemma11} is a worst case over the wanted sets.  A random
+wanted set of the same size meets it up to lower-order factors: a leaf of
+order \(d\) is shared by at most \(\binomial{L-m+d}{d}\) output strings, and the
+expected number of visited leaves of order \(d\) is about
+\(\min(|U|\alpha_d,\beta_d)\).  A gain needs a wanted set that is close to a
+union of sub-tiles.  Simulation cannot test this: feasible sizes have
+\(c=L/m\approx3\), where the \(\beta_d\) grow with \(d\) and every wanted set
+saturates the tree, while the relevant regime \(c\approx21\) has at least
+\(10^{21}\) leaves already for \(m=1\).  Zeros in the encodings do not help
+either: an encoding at a leaf with \(\Pz\) on a set \(Z\) of levels is a signed
+sum of at least \(3^{|Z|}\) entries, and for the dominant leaves
+(\(|Z|\approx0.89m\)) the expected number of nonzero terms tends to infinity.
+
+\subsection{Open problems}
+
+\begin{enumerate}
+\item \emph{New sharing structures.}  An identity in which outer outputs are
+  fed by several terms, or with several inner outputs, is outside the leaf
+  counting of Section~\ref{sec:recursion}.  Scoring such an identity needs a
+  generalization of \(\alpha_d\) and \(\beta_d\).
+\item \emph{Structured wanted sets.}  The reductions from 3SUM produce Exact
+  Triangle instances whose weights are array entries at additively combined
+  indices.  Whether the wanted sets are then far from random is not known.
+\end{enumerate}
+
+\begin{remark}[\nf]
+The exponent of matrix multiplication plays no role.  The choice of the prime
+costs \(n^{\omega}D'^{3/2}\), which is of lower order with Strassen's
+\(\omega\le\log_2 7\) already; rectangular fast matrix multiplication would not
+change any exponent of this paper.
+\end{remark}

@@ -1,0 +1,155 @@
+\section{Introduction}
+\label{sec:intro}
+
+Alman and Vassilevska Williams \cite{AV} gave the first truly subquadratic
+algorithm for 3SUM and the first truly subcubic algorithm for APSP.  Both
+follow from a deterministic algorithm for Exact Triangle in time
+\(n^{3-\ETpaper}\) up to a logarithmic factor, which rests on a fast algorithm
+for \emph{thin} matrix products: a recursion with Sch\"onhage's identity for
+\(\schon313\oplus\schon141\), pruned to the entries that are wanted.  The
+savings are small, and the paper does not optimize them.  The result has since
+been formalized in Lean~4 as a set of statements about programs of a word RAM
+\cite{upstream}.
+
+This paper asks how far the same method goes with the same base identity.  It
+has three ingredients, a determination of the optimal parameters, and the
+all-edges route to APSP that footnote~10 of the paper mentions.
+
+\subsection*{The ingredients}
+
+\emph{An exact count of the leaves} (Section~\ref{sec:exact}).  The cost of the
+recursion is governed by the numbers \(\beta_d\) of leaves of each order in a
+tile.  The paper bounds their tail by a geometric series.  We bound it by its
+exponential rate, a function \(\gtwo\) of the ratio \(c=L/m\) of the levels and
+of the relative order (Theorem~\ref{thm:tail}); the proof is a comparison of
+integers.  The paper's exponent is the tangent of the exact one at zero.  The
+algorithm does not change: the same program gets a better bound on its running
+time (Theorem~\ref{thm:offline}).
+
+\emph{The true size of the middle part} (Section~\ref{sec:middle}).  The
+reduction from Exact Triangle (Theorem~17 of the paper) produces instances
+whose middle part has about \(D'/g'\) vertices, where \(D'\) is the dimension
+parameter and \(g'\) the number of pieces per hash class, and calls the solver
+as if it had \(D'\).  Passing the true size changes one assignment of the
+program (Theorem~\ref{thm:mid}).  The solver then runs at a smaller inner
+dimension \(D\) and, relative to it, with fewer wanted entries:
+\(n^{2}/D^{\sigma}\) with \(\sigma>1/2\) instead of \(n^{2}/\sqrt D\).
+Equivalently, the weights are hashed modulo a larger prime
+(Remark~\ref{rem:prime}).
+
+\emph{Pruned encodings} (Section~\ref{sec:pruned}).  The recursion reads the
+encodings of the input only at the leaves with at most \(m\) symbols \(\Pz\).
+They can be computed by a pruned form of Yates' algorithm in \(O(LM)\)
+operations per band instead of \(O(10^{L})\) (Theorem~\ref{thm:pruned}), which
+relaxes the condition under which a product counts as thin.  We write the
+pruned encoder as a program and prove its running time on the machine
+(Theorem~\ref{thm:encoder}); the rest of the solver is upstream's, re-verified
+under the weaker contract that the encodings are right only at the leaves that
+are read.
+
+\emph{APSP through all-edges Exact Triangle} (Section~\ref{sec:alledges}).
+The known reductions give the \(\minplus\)-product and APSP a third of the
+saving of Exact Triangle.  Footnote~10 of the paper observes that the host of
+its reduction also solves the all-edges version of Exact Triangle, to which the
+\(\minplus\)-product reduces on the same number of vertices.  We write the two
+programs (the all-edges host and the reduction, Theorems~\ref{thm:mid-ae}
+and~\ref{thm:pairs}), and APSP keeps the whole saving.
+
+\subsection*{The optimum}
+
+With these ingredients the saving for Exact Triangle depends on four
+parameters.  For a fixed ratio \(c\) its supremum has a closed form: it is
+\(R(\Gam)\Gam/2\), where \(\Gam=\Gam(c)\) is the value at which two explicit
+curves cross and \(R\) is the bound of the thinness condition
+(Theorem~\ref{thm:sup}).  With pruned encodings the supremum over all ratios
+lies in the interval \((\SstarLo,\SstarHi]\), and only ratios in
+\((\cStarLo,\cStarHi)\) come within \(\SstarLo\)
+(Theorem~\ref{thm:global}); with the paper's encodings it lies in
+\((\SfullLo,\SfullHi]\), approached only for ratios in \((\cFullLo,\cFullHi)\)
+(Theorem~\ref{thm:global-full}).  The theorems reach every saving below the
+two suprema: the upstream program tests \(D^{18}\le N\) to decide whether its
+recursion applies, which excludes the optimal ratios, and we replace the test
+by one with a rational exponent (Section~\ref{sec:regime}).
+So the method, with this identity and these ingredients, ends at a saving of
+about \(\SprApprox\) for Exact Triangle, that is, at the exponent
+\(2-\SprApprox/2\) for 3SUM.  Section~\ref{sec:limits} explains why no identity
+of the same kind does better.
+
+\subsection*{Results}
+
+Table~\ref{tab:results} lists the exponents.  The column ``paper'' is
+\cite{AV}; each of the next columns adds one ingredient to the previous one.
+
+\begin{table}[ht]
+\centering\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{lccccc}
+\toprule
+ & paper
+ & Thm.~\ref{thm:T2}
+ & Thm.~\ref{thm:T3}
+ & Thm.~\ref{thm:T4}
+ & Thm.~\ref{thm:T1}\\
+\midrule
+added & & parameters & exact count & middle size & pruned enc.\\
+saving \(\delta\)
+ & \(\ETpaper\) & \(\dTwo\) & \(\dThree\) & \(\SfullLo\) & \(\dOne\)\\
+Exact Triangle
+ & \(\ETexpPaper\) & \(\ETTwo\) & \(\ETThree\) & \(\ETFour\) & \(\ETOne\)\\
+3SUM
+ & \(\ThreeSumPaperStated\) & \(\ThreeSumTwo\) & \(\ThreeSumThree\)
+ & \(\ThreeSumFour\) & \(\ThreeSumOne\)\\
+\(\minplus\)-product, APSP
+ & \(\APSPpaper\) & \(\APSPTwo\) & \(\APSPThree\) & \(\APSPFour\) & \(\APSPOne\)\\
+\quad all-edges route
+ & & & & \(\APSPFn\) & \(\APSPFnOne\)\\
+\midrule
+status & \cite{upstream} & checked & checked & checked & checked\\
+\bottomrule
+\end{tabular}
+\caption{Exponents \(a\) of the running times \(O(n^{a})\) of deterministic
+word-RAM programs.  The exponents of the column ``paper'' are those printed in
+\cite{AV} and proved in \cite{upstream}.  The all-edges route
+(Theorem~\ref{thm:apsp-ae}) is carried out for the two solvers of the last two
+columns.}
+\label{tab:results}
+\end{table}
+
+All four columns of new results hold without any hypothesis.  The first of
+them uses none of the ingredients: it is the algorithm and the analysis of the
+paper at better parameters.  The first three use the existing encoder, which is
+the paper's; the last uses the pruned encoder of Theorem~\ref{thm:encoder}.
+Theorems~\ref{thm:T4} and~\ref{thm:T1} give every saving below the two suprema
+of Theorems~\ref{thm:global-full} and~\ref{thm:global}; the decimal exponents
+are their values at one ratio each.
+
+\subsection*{Formalization}
+
+The results are formalized in Lean~4 \cite{Lean4} with Mathlib \cite{Mathlib},
+on top of the formalization \cite{upstream} of the original paper; the
+development and this paper are in the repository
+\url{https://github.com/qawbecrdtey/ImprovedExponents}.  Every time
+a result is machine-checked, the text names the Lean declarations in a
+typewriter face, as in \lean{sum_beta_le_exp}.  The heading of a numbered
+statement shows its status.
+\begin{itemize}
+\item \emph{No marker}: the statement is machine-checked.
+\item ``\nf'': the statement is proved here on paper and is not
+  machine-checked.  The marker never means ``unproved''.  It occurs only in
+  Section~\ref{sec:limits}, for the mixtures of shapes, the hypothetical
+  shapes, the experiments and a remark on \(\omega\); every numbered statement
+  outside Section~\ref{sec:limits} is machine-checked, and so is the
+  comparison of the shapes in Section~\ref{sec:limits}.
+\end{itemize}
+Section~\ref{sec:formalization} says what has to be trusted and how the
+development is checked.
+
+\subsection*{Organization}
+
+Section~\ref{sec:framework} recalls the framework of \cite{AV}.
+Sections~\ref{sec:exact}, \ref{sec:pruned} and~\ref{sec:middle} have the three
+ingredients, Section~\ref{sec:optimum} the optimal parameters and
+Section~\ref{sec:consequences} the theorems for 3SUM, Exact Triangle, the
+\(\minplus\)-product and APSP, together with the all-edges route to APSP.
+Section~\ref{sec:formalization} describes the formalization and
+Section~\ref{sec:limits} the limits of the method.

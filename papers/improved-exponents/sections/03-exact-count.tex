@@ -1,0 +1,210 @@
+\section{The exact count of the leaves}
+\label{sec:exact}
+
+The paper bounds the tail \(\sum_{d\ge t}\beta_d\) of the leaf counts by a
+geometric series.  This section bounds it by its true exponential rate.  The
+program does not change; only its analysis does.
+
+\subsection{The rate function}
+
+\begin{definition}\label{def:g2}
+For \(c>1\) and \(0\le\delta\le1\) let
+\[
+  \gtwo(c,\delta)=\psi(c-1)-\psi(c-1+\delta)-\psi(1-\delta)+\delta\ln 9
+  =c\,\Hent\Bigl(\frac{1-\delta}{c}\Bigr)-c\,\Hent\Bigl(\frac1c\Bigr)+\delta\ln 9,
+\]
+and \(\gX(c,\theta)=-\gtwo(c,\theta)/\ln 4\).
+\end{definition}
+
+The two expressions agree because
+\(c\,\Hent(x/c)=c\ln c-\psi(x)-\psi(c-x)\) for \(0\le x\le c\).  In Lean the
+functions are \lean{g2} and \lean{gammaX}.
+
+\begin{lemma}\label{lem:g2}
+Let \(c\ge 10\).
+\begin{enumerate}
+\item \(\partial\gtwo/\partial\delta=\ln\bigl(9(1-\delta)/(c-1+\delta)\bigr)\le0\)
+  for \(0<\delta<1\).  So \(\gtwo(c,\cdot)\) is nonincreasing on \([0,1]\), and
+  strictly decreasing if \(c>10\).
+\item \(\partial\gtwo/\partial c=\ln\bigl((c-1)/(c-1+\delta)\bigr)\le0\).  So
+  \(\gtwo(\cdot,\delta)\) is nonincreasing on \([1,\infty)\).
+\item \(\gtwo(c,0)=0\), and \(\gtwo(c,\delta)<0\) for \(c>10\) and
+  \(0<\delta\le1\).
+\item \(\gtwo(c,\delta)\le\delta\ln\rho_c\) with \(\rho_c=9/(c-1)\).  Hence
+  \(\gpap(c,\theta)\le\gX(c,\theta)\) for \(0\le\theta\le1\), and for \(c>10\)
+  the inequality is strict unless \(\theta=0\).
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+(i) and (ii) follow from \(\psi'(x)=\ln x+1\).  The sign in (i) is that of
+\(9(1-\delta)-(c-1+\delta)=10-c-10\delta\).  (iii) follows from (i).  For (iv),
+the second derivative of \(\gtwo(c,\cdot)\) is
+\(-1/(c-1+\delta)-1/(1-\delta)<0\), so the function is strictly concave and lies
+below its tangent at \(0\), which is \(\delta\mapsto\delta\ln\rho_c\).
+\end{proof}
+
+The parts of the lemma are \lean{hasDerivAt_g2_right},
+\lean{g2_antitoneOn_right}, \lean{g2_strictAntiOn_right},
+\lean{hasDerivAt_g2_left}, \lean{g2_antitoneOn_left}, \lean{g2_neg} and
+\lean{gammaOf_le_gammaX}; the strict inequalities of (iv), \(\gtwo(c,\delta)<\delta\ln\rho_c\)
+for \(\delta>0\) and \(\gpap(c,\theta)<\gX(c,\theta)\) for \(\theta>0\) and
+\(c>10\), are \lean{g2_lt_mul_log_rhoC} and \lean{gammaOf_lt_gammaX}.
+
+\subsection{The tail}
+
+\begin{theorem}[Exact tail]\label{thm:tail}
+Let \(m\ge1\), \(L\ge10m\) and \(0\le t\le m\).  Then
+\[
+  \sum_{d=t}^{m}\beta_d\le(m+1)(L+1)\,M\,e^{m\,\gtwo(L/m,\,t/m)} .
+\]
+\end{theorem}
+
+\begin{proof}
+First,
+\begin{equation}\label{eq:exp-g2}
+  e^{m\,\gtwo(L/m,\,t/m)}
+  =\frac{9^{t}\,m^{m}\,(L-m)^{L-m}}{(m-t)^{m-t}\,(L-m+t)^{L-m+t}},
+\end{equation}
+with \(0^{0}=1\).  Indeed \(m\,\psi(x/m)=\psi(x)-x\ln m\), so
+\(m\,\gtwo(L/m,t/m)=\psi(L-m)+\psi(m)-\psi(L-m+t)-\psi(m-t)+t\ln 9\), the
+multiples of \(\ln m\) cancelling.
+
+So it suffices to prove, for \(t\le d\le m\), the inequality between integers
+\begin{equation}\label{eq:beta-int}
+  \beta_d\,(m-t)^{m-t}(L-m+t)^{L-m+t}\le(L+1)\,M\,9^{t}\,m^{m}(L-m)^{L-m},
+\end{equation}
+and to sum it over the at most \(m+1\) values of \(d\).  It follows from three
+facts.
+\begin{enumerate}
+\item For \(j\le j_0\le L/10\),
+  \(\binomial Lj9^{j_0-j}\le\binomial L{j_0}\): the ratio of consecutive
+  binomial coefficients is \((L-j)/(j+1)\ge9\) for \(j<L/10\).
+\item \(\binomial L{j_0}j_0^{j_0}(L-j_0)^{L-j_0}\le L^{L}\): the left-hand side
+  is one term of the binomial expansion of \((j_0+(L-j_0))^{L}\).
+\item \(L^{L}\le(L+1)\binomial Lm m^{m}(L-m)^{L-m}\): the expansion of
+  \((m+(L-m))^{L}\) has \(L+1\) terms, and the term with index \(m\) is the
+  largest.
+\end{enumerate}
+Apply (i) with \(j=m-d\) and \(j_0=m-t\), which is at most \(L/10\):
+\(\beta_d=\binomial L{m-d}9^{d-t}\cdot9^{L-m+t}\le\binomial L{m-t}9^{L-m+t}\).
+By (ii) with the same \(j_0\) and then (iii), the left-hand side of
+\eqref{eq:beta-int} is at most
+\(9^{L-m+t}L^{L}\le9^{L-m+t}(L+1)\binomial Lm m^{m}(L-m)^{L-m}\), which is the
+right-hand side because \(M=\binomial Lm9^{L-m}\).
+\end{proof}
+
+In Lean: \lean{exp_mul_g2_div} is \eqref{eq:exp-g2},
+\lean{choose_mul_nine_pow_le} is fact~(i), \lean{beta_mul_le} is
+\eqref{eq:beta-int}, and \lean{sum_beta_le_exp} is the theorem.
+
+\begin{corollary}\label{cor:tail}
+Let \(c>10\), \(0\le\theta\le1\), \(m\ge1\), \(L=\lceil cm\rceil\),
+\(t=\lceil\theta m\rceil\) and \(D=4^{m}\).  Then
+\[
+  \sum_{d=t}^{m}\beta_d\le(m+1)(L+1)\,M\,D^{-\gX(c,\theta)} .
+\]
+\end{corollary}
+
+\begin{proof}
+\(L/m\ge c\) and \(\theta\le t/m\le1\), so
+\(\gtwo(L/m,t/m)\le\gtwo(c,\theta)\) by Lemma~\ref{lem:g2}(i),(ii), and
+\(e^{m\,\gtwo(c,\theta)}=D^{-\gX(c,\theta)}\).
+\end{proof}
+
+In Lean: \lean{sum_beta_le_rpow}.
+
+\subsection{The offline routine with the exact exponent}
+
+By \eqref{eq:boxes} and Corollary~\ref{cor:tail}, the boxes of all tiles number
+at most \(4(m+1)^{2}(L+1)N^{2}D^{-\gX(c,\theta)}\).  For \(\gamma<\gX(c,\theta)\)
+the factor \((m+1)(L+1)\) is absorbed by \(D^{\gX-\gamma}\).  So the first
+summand of \eqref{eq:cost8} can be replaced by \(O(N^{2}\log^{2}D/D^{\gamma})\)
+for every \(\gamma<\gX(c,\theta)\); the expression with the exact tail in place
+of the geometric bound is \lean{cost8X}.
+
+\begin{theorem}[The offline routine]\label{thm:offline}
+Let \(c=a/b>10\) and \(\theta=p/q\in(0,0.9)\) be rational, let
+\(0<\gamma<\gX(c,\theta)\) and \(\varepsilon<\Rc(\gamma)\).  For every large
+enough threshold \(m_0\), the offline routine of Section~4.4 of the paper at
+the parameters \((c,\theta,m_0)\), as a program, runs in at most a constant
+times
+\[
+  \frac{N^{2}(\log D+1)^{2}}{D^{\gamma}}+w\,D^{q(\theta)}(\log D+1)
+\]
+steps on every instance with \(1\le D\le N^{\varepsilon}\) and \(w\) wanted
+positions.
+\end{theorem}
+
+The program is \lean{program31} of \cite{upstream}, unchanged.  Its time is
+bounded upstream by a constant times any pair of bounds that dominate the two
+costs of Theorem~30; the proof is repeated against \lean{cost8X}
+(\lean{exists_tPreCore_leX}, \lean{exists_tOffline32_leX}), and the corollary
+above supplies the domination (\lean{first_termX}, \lean{costsX}).  The theorem
+is \lean{offlineWithinX}.  The statement that a procedure of the program solves
+the thin product within these bounds on all instances with \(D\le N^{\varepsilon}\)
+is \lean{thinClaim_gammaX}; it has two more hypotheses, which come from the
+regime test \(D^{18}\le N\) in the program text and are discussed in
+Section~\ref{sec:consequences}.
+
+\subsection{The form of Section~2}
+
+The same count improves Lemma~11 of the paper directly.  The theorems of
+Section~\ref{sec:consequences} use the form of Section~4 above and do not need
+the following statement.
+
+\begin{proposition}[Lemma~11 with the exact count]\label{prop:lemmaA}
+Let \(c\ge1\), \(\kappa\in\R\), \(m\ge1\) and \(L\ge\max(10m,cm)\).  Let \(W\)
+be a set of wanted positions of an \(N\times N\) matrix with
+\(|W|\le N^{2}/D^{\kappa}\), and for each tile \(T\) let \(W_T\) be the set of
+output strings of \(T\) that are wanted.  Then
+\[
+  \sum_T|\Leaves(W_T)|\le\sum_{d=0}^{m}\min\bigl(|W|\alpha_d,\ \tau\beta_d\bigr)
+  \le4(m+1)(L+1)\,N'^{2}\,e^{m\,\Gamma_c(\kappa)},
+\]
+where \(\tau\) is the number of tiles, \(N'\) is the size of the matrix padded
+to a multiple of the side of a tile, and
+\[
+  \Gamma_c(\kappa)=\sup_{0\le\delta\le1}
+    \min\bigl(\fone(\delta),\gtwo(c,\delta)\bigr),\qquad
+  \fone(\delta)=-\kappa\ln 4+\Hent(\delta)+\delta\ln 9=(q(\delta)-\kappa)\ln 4 .
+\]
+If the side of a tile is at most \(N\), then \(N'\le2N\).
+\end{proposition}
+
+So the number of leaves is at most \(16(m+1)(L+1)N^{2}D^{-\gamma_c(\kappa)}\) with
+\(\gamma_c(\kappa)=-\Gamma_c(\kappa)/\ln 4\).
+
+\begin{proof}
+By \eqref{eq:lemma11}, \(|\Leaves(W_T)|\le\sum_d\min(|W_T|\alpha_d,\beta_d)\).
+A sum of minima is at most the minimum of the sums, and
+\(\sum_T|W_T|\le|W|\); this is the first inequality.  Fix \(d\) and put
+\(\delta=d/m\).  First, \(\alpha_d=\binomial md9^{d}\le
+e^{m(\Hent(\delta)+\delta\ln 9)}\), so
+\(|W|\alpha_d\le N^{2}e^{m\fone(\delta)}\le N'^{2}e^{m\fone(\delta)}\).
+Second, \(\tau M\le4N'^{2}\), and by the inequality \eqref{eq:beta-int} with
+\(t=d\) and by \eqref{eq:exp-g2},
+\(\beta_d/M\le(L+1)e^{m\,\gtwo(L/m,\delta)}\le(L+1)e^{m\,\gtwo(c,\delta)}\), where
+the last step is Lemma~\ref{lem:g2}(ii).  So each of the \(m+1\) values of \(d\)
+contributes at most
+\(4(L+1)N'^{2}e^{m\min(\fone(\delta),\gtwo(c,\delta))}\).
+\end{proof}
+
+In Lean (file \lean{ExactCount/Leaves.lean}): \(\fone\) is \lean{f1} and
+\(\Gamma_c(\kappa)\) is \lean{GammaMM}; the first inequality is
+\lean{sum_card_Leaves_le_sum_min}, the second is
+\lean{sum_card_Leaves_le_exp_padN}, and the form with \(16N^{2}\) is
+\lean{sum_card_Leaves_le_exp}.
+
+\begin{remark}\label{rem:same-exponent}
+\(\fone\) increases strictly on \([0,0.9]\) and \(\gtwo(c,\cdot)\) is
+nonincreasing, so the supremum is taken where they cross: for every
+\(\delta_0\in[0,0.9]\),
+\(\min(\fone,\gtwo)(\delta_0)\le\Gamma_c(\kappa)\le\max(\fone,\gtwo)(\delta_0)\)
+(\lean{min_le_GammaMM}, \lean{GammaMM_le_max}).  For \(c>10\) and
+\(0<\kappa<\log_4 10\) they do cross, and \(\Gamma_c(\kappa)<0\)
+(\lean{exists_crossing_f1_g2}).  At the crossing
+\(\gX(c,\delta)=\kappa-q(\delta)\), which is also where the two terms of
+\eqref{eq:cor32} balance when \(\gamma\) is replaced by \(\gX\).  The two forms
+have the same exponent.
+\end{remark}

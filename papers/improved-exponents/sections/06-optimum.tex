@@ -1,0 +1,249 @@
+\section{The optimal parameters}
+\label{sec:optimum}
+
+The method has four real parameters: the ratio \(c>10\), the switching ratio
+\(0<\theta<0.9\), the size \(1/2\le\sigma<1\) of the prime, and the exponent
+\(\varepsilon>0\) of the inner dimension.  This section finds the supremum of
+the saving of Definition~\ref{def:saving} over the parameters that the method
+allows.
+
+\subsection{Definitions}
+
+Let \(A>0\) be a \emph{thinness constant} and
+\[
+  R(\gamma)=\frac{\ln 4}{A+\gamma\ln 4},\qquad F(\gamma)=\frac{R(\gamma)\,\gamma}{2}.
+\]
+The paper's encodings have \(A=\Afull(c)\), so that \(R=\Rc\) of \eqref{eq:Rc},
+and pruned encodings have \(A=\Apr(c)\), so that \(R=\RcP\) of \eqref{eq:RcP}.
+A tuple \((c,\theta,\sigma,\varepsilon)\) is \emph{admissible} for \(A\) if
+\(c>10\), \(0<\theta<0.9\), \(1/2\le\sigma<1\) and
+\(0<\varepsilon<R(\gX(c,\theta))\).  Put
+\[
+  \gQ(\theta)=\frac{2-4q(\theta)}{3},\qquad
+  \Gam(c)=\sup_{0<\theta<0.9}\min\bigl(\gX(c,\theta),\gQ(\theta)\bigr).
+\]
+In Lean: \lean{thinR}, \lean{savingF}, \lean{AdmissibleX}, \lean{gammaQ},
+\lean{Gam}.
+
+\subsection{The crossing point}
+
+\begin{lemma}\label{lem:crossing}
+Let \(c>10\).  On \([0,0.9]\) the function \(\gX(c,\cdot)\) is continuous and
+strictly increasing with \(\gX(c,0)=0\), and \(\gQ\) is continuous and strictly
+decreasing with \(\gQ(0)=2/3\) and \(\gQ(0.9)<0\).  They cross at exactly one
+point \(\theta^{*}(c)\in(0,0.9)\), and \(\Gam(c)\) is their common value there.
+Moreover \(0<\Gam(c)<2/3\), and
+\[
+  \min\bigl(\gX(c,\theta),\gQ(\theta)\bigr)\le\Gam(c)
+  \le\max\bigl(\gX(c,\theta),\gQ(\theta)\bigr)\qquad(0<\theta<0.9).
+\]
+\(\Gam\) is nondecreasing on \((10,\infty)\).
+\end{lemma}
+
+\begin{proof}
+\(\gX(c,\cdot)\) increases strictly by Lemma~\ref{lem:g2}(i).  The function
+\(q\) increases strictly on \([0,0.9]\), since
+\(q'(\theta)\ln 4=\ln(9(1-\theta)/\theta)>0\) for \(\theta<0.9\), and
+\(q(0.9)=\log_4 10>1\).  The intermediate value theorem gives the crossing, and
+monotonicity gives uniqueness and the two inequalities.  The last statement
+holds because \(\gX\) is nondecreasing in \(c\) (Lemma~\ref{lem:g2}(ii)), so
+that \(\min(\gX(c,\theta),\gQ(\theta))\) is.
+\end{proof}
+
+In Lean: \lean{existsUnique_crossing}, \lean{Gam_eq_of_crossing},
+\lean{Gam_pos}, \lean{Gam_lt_two_thirds}, \lean{Gam_ge_min}, \lean{Gam_le_max},
+\lean{Gam_monotoneOn}.  The two inequalities are what the numerical bounds
+below rest on: every \(\theta\) gives a lower and an upper bound for
+\(\Gam(c)\).
+
+\subsection{The supremum for a fixed ratio}
+
+\begin{theorem}[Supremum of the saving]\label{thm:sup}
+Let \(c>10\) and \(A>0\).  Over the tuples \((c,\theta,\sigma,\varepsilon)\)
+that are admissible for \(A\),
+\[
+  \sup\ \sav(c,\theta,\sigma,\varepsilon)=S(c):=F(\Gam(c))=\frac{R(\Gam(c))\,\Gam(c)}{2},
+\]
+and the supremum is not attained.  It is approached at
+\(\theta=\theta^{*}(c)\), \(\sigma=1/2+\Gam(c)/4\) and
+\(\varepsilon\uparrow R(\Gam(c))\).
+\end{theorem}
+
+\begin{proof}
+\(R\) is positive and strictly decreasing on \([0,\infty)\), and
+\(F(\gamma)=\frac12\bigl(1-A/(A+\gamma\ln 4)\bigr)\) is strictly increasing
+there.
+
+\emph{Upper bound.}  Let the tuple be admissible, and put
+\(a=\gX(c,\theta)\), \(u=2\sigma-1\in[0,1)\) and
+\(v=\min(u,\min(a,\sigma-q(\theta))-u)\), so that the saving is
+\(\varepsilon v\).  If \(v\le0\) the saving is at most \(0<F(\Gam(c))\).  Let
+\(v>0\).  Then \(v\le u\) and \(v\le a-u\), so \(v\le a/2\).  Also
+\(v\le\sigma-q(\theta)-u=(1-u)/2-q(\theta)\le(1-v)/2-q(\theta)\), so
+\(v\le(1-2q(\theta))/3=\gQ(\theta)/2\).  Hence
+\(v\le\min(a,\gQ(\theta))/2\le\Gam(c)/2\) by Lemma~\ref{lem:crossing}.  Since
+\(\varepsilon<R(a)\) and \(v>0\), the saving is less than \(R(a)v\).  If
+\(a\le\Gam(c)\), then \(R(a)v\le R(a)a/2=F(a)\le F(\Gam(c))\).  If
+\(a>\Gam(c)\), then \(R(a)v\le R(\Gam(c))\Gam(c)/2\).
+
+\emph{Approach.}  At \(\theta=\theta^{*}(c)\) we have
+\(\gX(c,\theta)=\gQ(\theta)=\Gam\), that is, \(q(\theta)=1/2-3\Gam/4\).  With
+\(\sigma=1/2+\Gam/4\) we get \(u=\Gam/2\) and \(\sigma-q(\theta)=\Gam\), so
+\(v=\Gam/2\) and the saving is \(\varepsilon\Gam/2\), for every
+\(0<\varepsilon<R(\Gam)\).  Here \(\sigma<1\) because \(\Gam<2/3\).
+\end{proof}
+
+In Lean: \lean{tupleSaving_lt_savingF}, \lean{tupleSaving_crossing},
+\lean{exists_tupleSaving_gt}, \lean{isLUB_tupleSaving} and
+\lean{savingF_notMem_tupleSaving}.
+
+Programs can only use rational parameters.  Nothing is lost: the saving is
+continuous in the four parameters, admissibility is an open condition when
+\(A\) depends continuously on \(c\), and both \(\Afull\) and \(\Apr\) do.
+
+\begin{proposition}\label{prop:rational}
+Let \(A\) be \(\Afull\) or \(\Apr\), let \(c>10\) and \(s<F_{A(c)}(\Gam(c))\).
+For every \(c_1>c\) there are rational numbers
+\(c',\theta',\sigma',\varepsilon'\) with \(c<c'<c_1\) and \(\sigma'>1/2\) such
+that \((c',\theta',\sigma',\varepsilon')\) is admissible for \(A(c')\) and
+\(\sav(c',\theta',\sigma',\varepsilon')>s\).
+\end{proposition}
+
+In Lean: \lean{exists_rat_tuple_baseFull} and
+\lean{exists_rat_tuple_basePruned}, from \lean{continuous_tupleSaving}.
+
+If every call is charged at \(D'\), as in the paper, the condition of
+Theorem~\ref{thm:total} is \(\delta<d\min(\eta,\min(\gamma,\frac12-q)-\eta)\)
+with \(d<\varepsilon\).  The constraint from the queries is then
+\(\gamma\le\frac12-q\) instead of \(\gamma\le\sigma-q\) with
+\(\sigma=\frac12+\frac\gamma4\), which is \(\gamma\le\gQ\).  The following
+proposition says what this costs.
+
+\begin{proposition}[The paper's accounting]\label{prop:half}
+Let \(c>10\) and \(A>0\).  Put
+\(\Gam_{1/2}(c)=\sup_{0<\theta<0.9}\min\bigl(\gX(c,\theta),\tfrac12-q(\theta)\bigr)\),
+and call \((\theta,\gamma,\varepsilon,\eta)\) admissible for \(A\) if
+\(0<\theta<0.9\), \(0<\gamma<\gX(c,\theta)\), \(0<\varepsilon<R(\gamma)\) and
+\(0<\eta<\frac12\).  Then \(\gX(c,\cdot)\) and \(\frac12-q\) cross in
+\((0,0.9)\), \(\Gam_{1/2}(c)\) is their value at the crossing, and
+\[
+  \sup\ \varepsilon\min\bigl(\eta,\ \min(\gamma,\tfrac12-q(\theta))-\eta\bigr)
+  =F(\Gam_{1/2}(c))<F(\Gam(c)),
+\]
+the supremum over the admissible tuples; moreover \(\Gam_{1/2}(c)<\Gam(c)\).
+\end{proposition}
+
+The admissible tuples are exactly the hypotheses of Theorem~\ref{thm:T3}'s
+general form (\lean{allSolved_exact}), with \(d\) absorbed into
+\(\varepsilon\).  The supremum is approached at the crossing with
+\(\eta=\gamma/2\).  In Lean (file \lean{Optimum/PaperAccounting.lean}):
+\lean{GamHalf}, \lean{exists_crossing_half}, \lean{GamHalf_eq_of_crossing},
+\lean{GamHalf_lt_Gam}; the saving is \lean{paperSaving}, the admissible tuples
+are \lean{AdmissibleHalf}, the supremum is \lean{isLUB_paperSaving}, and the
+strict inequality between the two suprema is \lean{savingF_GamHalf_lt}.
+
+\subsection{Numerical values and the optimum over the ratio}
+\label{sec:numerics}
+
+Both thinness constants are nondecreasing in \(c\) on \([10,\infty)\): the
+derivatives are
+\(\Afull'(c)=\ln\frac{10}{3}+\frac12\ln(1-\frac1c)\) and
+\(\Apr'(c)=\ln 3-\frac12\ln(1-\frac1c)\) (\lean{baseFull_monotoneOn},
+\lean{basePruned_monotoneOn}).  So two effects compete in \(S(c)=F_{A(c)}(\Gam(c))\): \(\Gam\) grows with
+\(c\), and \(R\) shrinks.
+
+Numerically, with pruned encodings \(S\) is largest at \(c\approx\cPrApprox\),
+where \(S\approx\SprApprox\), \(\Gam\approx\GamPrApprox\),
+\(\sigma\approx\sigmaPrApprox\), \(\varepsilon\approx\epsPrApprox\) and
+\(\theta^{*}\approx\thetaPrApprox\).  With the paper's encodings it is largest
+at \(c\approx\cFullApprox\), where \(S\approx\SfullApprox\).
+
+These values are computed in floating point.  The following are certified.
+
+\begin{proposition}[Values at three ratios]\label{prop:values}
+\begin{enumerate}
+\item At \(c=\cUncondOpt\) with the paper's encodings:
+  \(24.8438\le\Afull(c)\le24.84381\), \(0.0741364\le\Gam(c)\le0.0741372\) and
+  \(\SfullLo<S(c)<0.00206\).
+\item At \(c=\cUncond\) with the paper's encodings: \(\Afull(c)\ge18\ln4\),
+  \(0.074835\le\Gam(c)\le0.074837\), \(0.05504<\Rc(\Gam(c))<0.05505\) and
+  \(\dFour<S(c)<0.00206\).
+\item At \(c=\cCond\) with pruned encodings: \(0.0762<\Gam(c)<0.0763\),
+  \(\epsCond<\RcP(\Gam(c))<0.05499\) and \(\SstarLo<S(c)<\SstarHi\).
+\end{enumerate}
+\end{proposition}
+
+In Lean: \lean{baseFull_107_5_mem}, \lean{Gam_107_5_mem},
+\lean{savingF_full_107_5_gt}, \lean{savingF_full_107_5_lt}; \lean{baseFull_ge_18},
+\lean{Gam_108_5_mem}, \lean{Rc_108_5_bounds}, \lean{savingF_full_gt},
+\lean{savingF_full_lt}; \lean{Gam_22_bounds}, \lean{thinR_pruned_bounds},
+\lean{savingF_pruned_gt}, \lean{savingF_pruned_lt}.
+
+\begin{theorem}[The optimum over the ratio]\label{thm:global}
+Let \(S(c)=F_{\Apr(c)}(\Gam(c))\) be the supremum of the saving with pruned
+encodings at the ratio \(c\).  Then
+\[
+  \SstarLo<\sup_{c>10}S(c)\le\SstarHi,
+\]
+and every \(c>10\) with \(S(c)\ge\SstarLo\) lies in \((\cStarLo,\cStarHi)\).
+\end{theorem}
+
+\begin{proof}
+The lower bound is Proposition~\ref{prop:values}(iii).  For the upper bounds,
+every \(\theta\in(0,0.9)\) gives \(\Gam(c)\le\max(\gX(c,\theta),\gQ(\theta))\)
+by Lemma~\ref{lem:crossing}, and the values of \(\gX\), \(\gQ\) and \(\Apr\) at
+rational arguments are enclosed between rational numbers by enclosing the
+logarithms that occur in them.  On a cell \([c_1,c_2]\) both \(\Apr\) and
+\(\Gam\) are nondecreasing, \(F_A(\gamma)\) decreases in \(A\) and increases in
+\(\gamma\), so
+\[
+  S(c)\le F_{\Apr(c_1)}(\Gam(c_2))\qquad(c_1\le c\le c_2).
+\]
+The interval \((10,200]\) is cut into 222 cells, each with a certified bound of
+this form: 68 cells cover \((10,\cStarLo]\) and \([\cStarHi,200]\) with the
+bound \(\SstarLo\), and 154 cells, of width about \(0.007\) near the maximum,
+cover \([\cStarLo,\cStarHi]\) with the bound \(\SstarHi\).  For \(c\ge200\),
+\(\Gam(c)<2/3\) and \(\Apr(c)\ge\Apr(200)>221.77\) give
+\(S(c)<F_{\Apr(200)}(2/3)<\SstarLo\).
+\end{proof}
+
+In Lean: \lean{optimum_global}, from \lean{savingF_pruned_lt_outside},
+\lean{savingF_pruned_lt_global_tight}, \lean{mem_Ioo_of_savingF_pruned_ge} and
+\lean{SstarPruned_bounds}; the supremum is \lean{SstarPruned}.  The cells are
+generated by the script \texttt{search/certs.py} of the repository, which
+chooses the endpoints and the points \(\theta\) in floating point and checks
+every emitted inequality in exact rational arithmetic; Lean checks them again
+(files \lean{Optimum/GlobalCells1.lean} to \lean{Optimum/GlobalCells5.lean}).  The
+enclosures of the logarithms are those of \cite{upstream}, a series for
+\(\ln\frac{1+z}{1-z}\) with an explicit remainder (\lean{log_mem}).
+
+The same method certifies the optimum with the paper's encodings, which is the
+optimum of Theorem~\ref{thm:T4}.
+
+\begin{theorem}[The optimum over the ratio, paper's encodings]\label{thm:global-full}
+Let \(S(c)=F_{\Afull(c)}(\Gam(c))\) be the supremum of the saving with the
+paper's encodings at the ratio \(c\).  Then
+\[
+  \SfullLo<\sup_{c>10}S(c)\le\SfullHi,
+\]
+and every \(c>10\) with \(S(c)\ge\SfullLo\) lies in \((\cFullLo,\cFullHi)\).
+\end{theorem}
+
+\begin{proof}
+As for Theorem~\ref{thm:global}, with \(\Afull\) in place of \(\Apr\): the lower
+bound is Proposition~\ref{prop:values}(i), and 261 cells cover \((10,200]\),
+87 below \(\cFullLo\) and 86 above \(\cFullHi\) with the bound \(\SfullLo\), and 88
+on \([\cFullLo,\cFullHi]\) with the bound \(\SfullHi\); for \(c\ge200\),
+\(\Afull(200)>238.74\).
+\end{proof}
+
+In Lean: \lean{SstarFull}, \lean{SstarFull_bounds}, \lean{SstarFull_le},
+\lean{mem_Ioo_of_savingF_full_ge}, \lean{savingF_full_lt_global_tight},
+\lean{lt_SstarFull_iff}, and the cells \lean{Optimum/GlobalFullCells1.lean} to
+\lean{Optimum/GlobalFullCells6.lean}.
+
+The upper bounds \(\SstarHi\) and \(\SfullHi\) are not strict, and the maximizers
+are not located more precisely than the two windows: both functions are flat
+near their maxima, \(S(21)\approx0.002093\) and \(S(23)\approx0.002092\) with
+pruned encodings, and \(S(\cFullLo)\approx S(\cFullHi)\approx0.0020588\) with the
+paper's encodings, just below \(\SfullLo\).

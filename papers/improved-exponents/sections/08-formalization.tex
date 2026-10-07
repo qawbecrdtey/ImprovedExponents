@@ -1,0 +1,239 @@
+\section{The formalization}
+\label{sec:formalization}
+
+The Lean development is the directory \lean{ImprovedExponents} of the
+repository \url{https://github.com/qawbecrdtey/ImprovedExponents}, which also
+contains this paper.  It has \LeanFiles{} files and
+\LeanLines{} lines, of which \LeanCellLines{} are generated certificates for
+Theorems~\ref{thm:global}, \ref{thm:global-full} and~\ref{prop:shapes}; about
+\LeanHandLines{} lines are written by hand.
+
+\subsection{Relation to the upstream formalization}
+
+The formalization \cite{upstream} of the paper is a dependency of our Lean
+package, fetched by Lake at a fixed revision (\texttt{\UpstreamRev}; Lean and
+Mathlib \texttt{\LeanVersion}, as upstream).  Nothing in it is edited.  It provides the word RAM
+and the notion \lean{Problem.SolvedInTime} (file \lean{EndStatement.lean}), a
+small programming language with a time model (\lean{lightModel}) and a compiler
+to the word RAM, the programs of the paper, and the proofs of its theorems.
+
+We reuse the following.
+\begin{itemize}
+\item The program of Section~4, \lean{program31}, for arbitrary rational
+  parameters, with its correctness and the bound of its running time in terms
+  of the two costs of Theorem~30.
+\item The count of the boxes, \lean{lemma_29_count}, which leaves the tail
+  \(\sum_{d\ge t}\beta_d\) explicit.
+\item The host of Theorem~17 and the passage from a host to a claim about
+  programs, \lean{claim17_of_host}.
+\item The reductions of Theorem~21 and the passage to the end statements:
+  \lean{threeSum_of_uniform}, \lean{minPlus_polylog_of_uniform},
+  \lean{apsp_polylog_of_uniform} and \lean{SolvedInTime.endStatement}.
+\item The enclosures of logarithms between rational numbers, \lean{log_mem}.
+\end{itemize}
+Upstream proves the bounds of the paper at the parameters of the paper.  Where
+an upstream proof fixes parameters, we repeat it for general ones: the solver
+of the thin product at arbitrary ratios (\lean{Pipeline/ThinClaim.lean}), the
+time of the program against the exact tail (\lean{Cost8X}), the routines that
+compute the parameters of the host (\lean{ParamRoutines}), and the arithmetic
+of the total time (\lean{Total}).  Where an upstream proof assumes the full
+encodings, we repeat it under the weaker contract of
+Section~\ref{sec:encoder-program}: the encoder of Theorem~5, the procedures of
+Theorem~30 and the routines with chosen parameters (\lean{PrunedProgram}), and
+the time of the new program against \lean{cost8P} (\lean{Cost8P}).  The file
+\texttt{NOTICE} of the repository lists the files that are adapted from
+upstream, which is distributed under the Apache~2.0 license.
+
+\subsection{What is new}
+
+Table~\ref{tab:dirs} lists the directories.
+
+\begin{table}[ht]
+\centering\small
+\begin{tabular}{lr>{\raggedright\arraybackslash}p{3.3in}}
+\toprule
+directory & lines & content\\
+\midrule
+\lean{ExactCount} & \LeanExactCountLines & \(\gtwo\), Theorem~\ref{thm:tail},
+  Proposition~\ref{prop:lemmaA}\\
+\lean{Cost8X} & \LeanCostEightXLines & the upstream program against the exact tail
+  (Theorem~\ref{thm:offline})\\
+\lean{PrunedEncoding} & \LeanPrunedEncodingLines & Theorem~\ref{thm:pruned},
+  Proposition~\ref{prop:costP}\\
+\lean{PrunedProgram} & \LeanPrunedProgramLines & the pruned encoder and the
+  solver under the weaker contract (Section~\ref{sec:encoder-program})\\
+\lean{Cost8P} & \LeanCostEightPLines & the new program against \lean{cost8P}
+  (Theorem~\ref{thm:encoder})\\
+\lean{HostMid} & \LeanHostMidLines & the host with one added assignment
+  (Theorem~\ref{thm:mid})\\
+\lean{ParamRoutines} & \LeanParamRoutinesLines & routines for \(\lfloor n^{a/b}\rfloor\) and
+  \(\lceil D^{c/d}\rceil\)\\
+\lean{Pipeline} & \LeanPipelineLines & thin-product claims, the regime
+  tests, the offline routines, the general theorems\\
+\lean{Total} & \LeanTotalLines & Theorem~\ref{thm:total}\\
+\lean{Optimum} & \LeanOptimumLines & Section~\ref{sec:optimum},
+  Proposition~\ref{prop:half}, the shapes of Section~\ref{sec:limits};
+  \LeanCellLines{} lines are generated\\
+\lean{MinPlus} & \LeanMinPlusLines & Lemma~\ref{lem:F},
+  Proposition~\ref{prop:minplus-math}\\
+\lean{AllEdges} & \LeanAllEdgesLines & the all-edges route to APSP
+  (Theorems~\ref{thm:pairs}, \ref{thm:mid-ae}, \ref{thm:apsp-ae})\\
+\lean{Statements.lean} & \LeanStatementsLines & the theorems of
+  Section~\ref{sec:consequences}\\
+\bottomrule
+\end{tabular}
+\caption{The Lean development.}
+\label{tab:dirs}
+\end{table}
+
+Two points of the formalization differ from a proof on paper.
+
+\emph{The programs are almost fixed.}  In Theorems~\ref{thm:T2}
+and~\ref{thm:T3} the program for the thin product and the host of the
+reduction are upstream's, at other parameters; the only new program text is
+that of the routines that compute \(D'=\lfloor n^{a/b}\rfloor\) and
+\(g'=\lceil D'^{c/d}\rceil\).  So the improvement from \(\ETpaper\) to
+\(\dThree\) is obtained by a new analysis of existing programs.
+Theorem~\ref{thm:T4} adds one assignment to the host and three short
+procedures for the regime test; the all-edges route (Theorem~\ref{thm:apsp-ae})
+adds the two hosts of Section~\ref{sec:alledges}, which reuse upstream's
+passes, scans, hashing and instance construction.  Theorem~\ref{thm:T1} adds
+seven procedures (\lean{programP}): the pruned encoder and six that call it,
+or call upstream's procedures under the new contract; the procedures that
+build the tiles and answer the queries are upstream's, with a new proof.
+
+\emph{Numerals are corollaries.}  The general theorems
+(\lean{allSolved_paper}, \lean{allSolved_exact}, \lean{allSolved_full},
+\lean{allSolved_pruned}) quantify over the parameters or over all savings
+below the closed form \(S(c)\).  The decimal exponents of
+Table~\ref{tab:results} follow from certified enclosures of \(S(c)\) at one
+ratio (Proposition~\ref{prop:values}).
+
+\subsection{The main statements}
+
+Table~\ref{tab:names} lists the Lean names of the main statements.
+
+\begin{table}[ht]
+\centering\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lll}
+\toprule
+statement & declaration & file\\
+\midrule
+Theorem~\ref{thm:tail} & \lean{sum_beta_le_exp} & \lean{ExactCount/Tail.lean}\\
+Proposition~\ref{prop:lemmaA} & \lean{sum_card_Leaves_le_exp}
+  & \lean{ExactCount/Leaves.lean}\\
+Theorem~\ref{thm:offline} & \lean{offlineWithinX} & \lean{Cost8X/Offline.lean}\\
+Theorem~\ref{thm:pruned} & \lean{pruned_encoding}
+  & \lean{PrunedEncoding/Pruned.lean}\\
+Proposition~\ref{prop:costP} & \lean{costsP} & \lean{PrunedEncoding/Costs.lean}\\
+Remark~\ref{rem:encwork} & \lean{encWorkP_le_M_div} & \lean{PrunedProgram/Work.lean}\\
+Theorem~\ref{thm:encoder} & \lean{prunedEncoderClaim}
+  & \lean{Pipeline/PrunedClaim.lean}\\
+ & \lean{encodeP_spec}, \lean{tEncP_le}
+  & \lean{PrunedProgram/Encode/Recursion.lean}\\
+ & \lean{offline32P_meets} & \lean{PrunedProgram/Wrapper/Offline.lean}\\
+ & \lean{offlineWithinP} & \lean{Cost8P/Offline.lean}\\
+Theorem~\ref{thm:mid} & \lean{claim17Mid_of_paramProcs}
+  & \lean{HostMid/AtParameters.lean}\\
+Theorem~\ref{thm:total} & \lean{explicitFrom_mid} & \lean{Total/Explicit.lean}\\
+Theorem~\ref{thm:sup} & \lean{isLUB_tupleSaving}
+  & \lean{Optimum/PerCSupremum.lean}\\
+Proposition~\ref{prop:rational} & \lean{exists_rat_tuple_basePruned}
+  & \lean{Optimum/PerCDensity.lean}\\
+Proposition~\ref{prop:half} & \lean{isLUB_paperSaving},
+  \lean{savingF_GamHalf_lt} & \lean{Optimum/PaperAccounting.lean}\\
+Theorem~\ref{thm:global} & \lean{optimum_global} & \lean{Statements.lean}\\
+Theorem~\ref{thm:global-full} & \lean{optimum_global_full} & \lean{Statements.lean}\\
+Theorem~\ref{thm:T2} & \lean{threeSum_paper}, \lean{apsp_paper}
+  & \lean{Statements.lean}\\
+Theorem~\ref{thm:T3} & \lean{threeSum_exact}, \lean{apsp_exact}
+  & \lean{Statements.lean}\\
+Theorem~\ref{thm:T4} & \lean{allSolved_full}, \lean{threeSum_full}
+  & \lean{Statements.lean}\\
+Theorem~\ref{thm:T1} & \lean{allSolved_pruned} & \lean{Pipeline/PrunedClaim.lean}\\
+ & \lean{threeSum_pruned}, \lean{apsp_pruned} & \lean{Statements.lean}\\
+Lemma~\ref{lem:F} & \lean{add_lt_iff_shiftDiff}
+  & \lean{MinPlus/Comparison.lean}\\
+Proposition~\ref{prop:minplus-math} & \lean{search_exactTriangle}
+  & \lean{MinPlus/ExactTriangle.lean}\\
+Theorem~\ref{thm:pairs} & \lean{isHost_pairsAE} & \lean{AllEdges/Pairs/Host.lean}\\
+Theorem~\ref{thm:mid-ae} & \lean{ae17_solves} & \lean{AllEdges/Host/ProgramAE.lean}\\
+ & \lean{midHostRat_ae} & \lean{AllEdges/Host/ClaimAE.lean}\\
+Theorem~\ref{thm:apsp-ae} & \lean{minPlusSolved_full}, \lean{apsp_allEdges}
+  & \lean{Statements.lean}\\
+ & \lean{minPlusSolved_pruned}, \lean{apsp_allEdges_pruned}
+  & \lean{Statements.lean}\\
+Proposition~\ref{prop:shapes} & \lean{shapes_table} & \lean{Optimum/Shapes/Table.lean}\\
+\bottomrule
+\end{tabular}
+\caption{The main statements and their Lean names.  The end statements for
+Exact Triangle, the \(\minplus\)-product and APSP are named in the same way
+(\texttt{exactTriangle\_full}, \texttt{minPlus\_full}, \texttt{apsp\_full},
+\texttt{minPlus\_allEdges}, and so on).}
+\label{tab:names}
+\end{table}
+
+\subsection{What has to be trusted}
+
+For the end statements of Theorems~\ref{thm:T2}, \ref{thm:T3}, \ref{thm:T4},
+\ref{thm:T1} and~\ref{thm:apsp-ae}: the Lean kernel, and the definitions of
+upstream's \lean{EndStatement.lean}, which state what it means that a problem is
+solved in time \(O(n^{r})\) on the word RAM.  That file imports nothing, and
+the module \texttt{ImprovedChallenge.lean} of the repository, which states the
+four strongest end statements, contains its 132 lines of Lean verbatim and
+imports nothing either.  An end statement such as
+\begin{center}
+\leanraw{theorem threeSum_pruned : EndStatement.ThreeSum.SolvedInTime 1.99896}
+\end{center}
+mentions no definition of ours and takes no argument.  No statement of this
+paper rests on a hypothesis.
+
+The development contains no \texttt{sorry} and declares no axiom.  Lean
+reports that the end statements depend on the axioms \texttt{propext},
+\texttt{Classical.choice} and \texttt{Quot.sound}, the three axioms that
+Mathlib uses throughout, and on no other; in particular the numerical
+certificates are checked by the kernel and not by compiled code.
+
+\subsection{How to check}
+
+In the root of the repository, \texttt{lake exe cache get} fetches the compiled
+Mathlib, and \texttt{lake build} checks everything: upstream, the library and
+the two modules described next.  The module \texttt{ImprovedChallenge.lean}
+states the four strongest end statements, \lean{threeSum_pruned}
+(\(\ThreeSumOne\)), \lean{exactTriangle_pruned} (\(\ETOne\)),
+\lean{minPlus_allEdges_pruned} and \lean{apsp_allEdges_pruned}
+(\(\APSPFnOne\); Theorems~\ref{thm:T1} and~\ref{thm:apsp-ae}), with
+upstream's \lean{EndStatement.lean} copied into it verbatim (the script
+\texttt{scripts/check-endstatement.sh} confirms the copy against the
+dependency) and nothing imported, each with \texttt{sorry} for its proof; the
+module \texttt{ImprovedSolution.lean} imports the proofs.  The two modules and
+the configuration \texttt{comparator.json} are in the form that the tool
+Comparator \cite{comparator} checks: that the solution proves the statements
+of the challenge, literally, that it uses only the axioms \texttt{propext},
+\texttt{Quot.sound} and \texttt{Classical.choice}, and that everything replays
+in Lean's kernel and in the independent kernel nanoda; the compilations run in
+a Landlock sandbox.  The script \texttt{scripts/comparator.sh} installs
+Comparator and lean4export at their releases v4.33.0, built with the project's
+toolchain v4.33.1, and nanoda and landrun at the revisions of upstream's
+continuous integration, and runs the check in a fresh copy of the sources.  We ran it on the final development:
+Comparator accepted the pair on \ComparatorDate{} (``Your solution is okay!'',
+both kernels; the log is \texttt{scripts/comparator-run.log}).  Every Lean
+file of the repository uses Lean's module system, and the statement module
+imports nothing, as the Palomar registry \cite{Palomar} requires of a
+submission.
+
+The certificates of Theorems~\ref{thm:global} and~\ref{thm:global-full} are
+regenerated by \texttt{python3 -m search.certs}, those of
+Proposition~\ref{prop:shapes} with the option \texttt{--encoding shapes}, and
+the script
+\texttt{check\_lean\_names.py} next to the source of this paper checks that
+every Lean name cited here exists in the sources.
+
+\subsection{What is not formalized}
+
+Only parts of Section~\ref{sec:limits}: the discussion of mixtures of
+shapes, the grid of hypothetical shapes, the experiments on the arrangement of
+the wanted set, and the remark on \(\omega\).  Each is marked ``\nf'' there.
+Everything else, including the comparison of the shapes of Sch\"onhage's
+family (Proposition~\ref{prop:shapes}), is machine-checked.

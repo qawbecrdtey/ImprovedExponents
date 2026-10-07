@@ -1,0 +1,159 @@
+\section{The framework of Alman and Vassilevska Williams}
+\label{sec:framework}
+
+We recall the parts of \cite{AV} that are used.  Numbers of lemmas and theorems
+``of the paper'' are those of \cite{AV}.  All logarithms are natural unless a
+base is written, \(\Hent(x)=-x\ln x-(1-x)\ln(1-x)\) is the entropy function, and
+\(\psi(x)=x\ln x\) with \(\psi(0)=0\).
+
+\subsection{Problems and the machine}
+\label{sec:machine}
+
+\emph{Exact Triangle} asks whether a weighted tripartite graph with \(n\)
+vertices per part has a triangle of weight zero.  \emph{3SUM} asks whether \(n\)
+integers contain three with sum zero.  The \emph{\(\minplus\)-product} of two
+\(n\times n\) integer matrices \(A,B\) is \(C_{ij}=\min_k(A_{ik}+B_{kj})\), and
+\emph{APSP} asks for all distances in a directed graph with integer weights and
+no negative cycle.
+
+The \emph{thin product} is the following task.  Given \(X\in\Z^{N\times D}\),
+\(Y\in\Z^{D\times N}\) and a set \(W\) of \emph{wanted} positions of the
+\(N\times N\) matrix \(XY\), compute \((XY)[I,J]\) for all \((I,J)\in W\).  The
+number \(D\) is the \emph{inner dimension}.  \(\LopTri(n,D)\)
+(Definition~13 of the paper) is the special case that Exact Triangle reduces
+to: a tripartite graph with outer parts of \(n\) vertices and a middle part of
+at most \(D\) vertices, and a set \(W\) of \emph{query pairs} of outer
+vertices; decide for each pair whether it has a common neighbor in the middle
+part.
+
+Running times are those of programs of a word RAM, in the sense of the
+formalization \cite{upstream} of the paper.  For a problem \(Q\) and a rational
+number \(r\), the statement \lean{Q.SolvedInTime}~\(r\) says: for every \(\kappa\)
+there are a program, a slope \(b\) and a bound \(T(n)=O(n^{r})\) such that the
+program is correct, within \(T(n)\) steps, on all instances of size \(n\) whose
+numbers have absolute value at most \(n^{\kappa}\), at every word size
+\(\ge b(\lfloor\log_2 n\rfloor+1)\).  The formalization proves Theorem~22 of
+the paper in this form, with \(r=\ThreeSumPaperStated\) for 3SUM and
+\(r=\APSPpaper\) for the \(\minplus\)-product and for APSP.
+
+\subsection{The recursion}
+\label{sec:recursion}
+
+The recursion of Section~2 of the paper applies Sch\"onhage's identity
+\cite{Sch81} for \(\schon313\oplus\schon141\).  The identity has ten terms.
+Nine of them feed one outer output each, and the tenth, \(\Pz\), is shared.  It
+has seven left variables: three outer ones and four inner ones.
+
+The identity is applied on \(L\) levels, \(m\) of which are inner.  We write
+\[
+  D=4^{m},\qquad N_0=3^{L-m},\qquad K=\binomial Lm,\qquad
+  M=K N_0^{2}=\binomial Lm 9^{L-m},\qquad c=\frac Lm\ge 10 .
+\]
+The matrix \(XY\) is cut into \emph{tiles} of side \(\sqrt K N_0\) (at most
+\(4N^2/M\) of them), each with \(M\) output strings, and the rows of \(X\) into
+\emph{bands} of \(\sqrt K N_0\) rows.
+
+A \emph{leaf} is a string of \(L\) terms.  Its \emph{order} is \(m\) minus its
+number of symbols \(\Pz\).  For a set \(U\) of output strings, \(\Leaves(U)\)
+is the set of leaves at which the recursion multiplies for some string of
+\(U\); these leaves have order between \(0\) and \(m\).  Two counts govern the
+cost:
+\[
+  \alpha_d=\binomial md 9^{d},\qquad
+  \beta_d=\binomial L{m-d}9^{L-m+d}\qquad(0\le d\le m).
+\]
+One output string is fed by \(\alpha_d\) leaves of order \(d\), and a tile has
+\(\beta_d\) leaves of order \(d\); \(\beta_0=M\).  Lemma~11 of the paper is the
+bound
+\begin{equation}\label{eq:lemma11}
+  |\Leaves(U)|\le\sum_{d=0}^{m}\min\bigl(|U|\alpha_d,\ \beta_d\bigr)
+\end{equation}
+for a set \(U\) of output strings of one tile, followed by an estimate of the
+right-hand side.
+
+\subsection{Boxes and queries}
+\label{sec:boxes}
+
+Section~4 of the paper (Theorem~30) turns the recursion into a data structure
+with a switching order \(0\le t\le m\).  The leaves of order at least \(t\) are
+covered by precomputed \emph{boxes}, at most
+\begin{equation}\label{eq:boxes}
+  (m+1)\sum_{d=t}^{m}\beta_d
+\end{equation}
+per tile (Lemma~29 of the paper).  A query for one entry sums over the leaves
+of order below \(t\) and costs \(O\bigl(L\sum_{d\le t}\alpha_d\bigr)\).  The
+encodings \(\Phi_\tau(a)\) of the input at all \(10^{L}\) leaves \(\tau\) are
+computed for every band by Yates' algorithm \cite{Yat37}.  The preprocessing
+costs a constant times the expression~(8) of the paper,
+\begin{equation}\label{eq:cost8}
+  L\,m\,\frac{\rho^{t}}{1-\rho}\,N^{2}+\frac{N\cdot 10^{L}}{\sqrt K N_0},
+  \qquad \rho=\frac{9m}{L-m+1},
+\end{equation}
+because the paper bounds \(\sum_{d\ge t}\beta_d\le M\rho^{t}/(1-\rho)\); the
+second summand is the cost of the encodings.
+
+Fix real numbers \(c>10\) and \(0<\theta<0.9\) and let \(L=\lceil cm\rceil\),
+\(t=\lceil\theta m\rceil\).  Then \(\rho<\rho_c:=9/(c-1)<1\).  Put
+\begin{equation}\label{eq:gpap-q}
+  \gpap(c,\theta)=\frac{\theta\ln(1/\rho_c)}{\ln 4},\qquad
+  q(\theta)=\frac{\Hent(\theta)+\theta\ln 9}{\ln 4}.
+\end{equation}
+The first summand of \eqref{eq:cost8} is \(O(N^{2}\log^{2}D/D^{\gpap})\) and a
+query costs \(O(D^{q(\theta)}\log D)\).  The second summand is at most
+\(N^{2}/D^{\gamma}\) when the instance is \emph{thin}: \(D\le N^{\varepsilon}\)
+with
+\begin{equation}\label{eq:Rc}
+  \varepsilon<\Rc(\gamma):=\frac{\ln 4}{\Afull(c)+\gamma\ln 4},\qquad
+  \Afull(c)=c\ln 10-\frac c2\Hent\Bigl(\frac1c\Bigr)-(c-1)\ln 3 .
+\end{equation}
+This is equation~(11) of the paper; \(\Afull(c)\) is the exponential rate of
+\(10^{L}/(\sqrt K N_0)\) per inner level.  Corollary~31 of the paper is the
+resulting data structure, and Corollary~32 the offline form: for
+\(|W|\le N^{2}/D^{\kappa}\) wanted entries the thin product takes time
+\begin{equation}\label{eq:cor32}
+  O\bigl(N^{2}\log^{2}D\,(D^{-\gamma}+D^{q(\theta)-\kappa})\bigr),
+  \qquad\gamma=\gpap(c,\theta).
+\end{equation}
+Corollary~26 of the paper takes \(c=21\), \(\theta=1/9\), \(\kappa=1/2\) and
+\(\varepsilon=1/18\), which gives \(\gamma=0.063\).
+
+\subsection{From the thin product to Exact Triangle}
+\label{sec:host}
+
+Theorem~17 of the paper reduces Exact Triangle on \(n\) vertices per part with
+weights of absolute value at most \(n^{\nu}\) to \(\LopTri\).  Let
+\(16\le D'\le n\) and let \(1\le g'\le\sqrt{D'}\) be an integer.  The weights
+are hashed modulo a prime \(p\in[\sqrt{D'}/2,\sqrt{D'})\) that is chosen to
+minimize the number of false positives.  The reduction produces at most
+\(4ng'\) instances of \(\LopTri(n,D')\) with at most \(n^{2}/\sqrt{D'}\) query
+pairs each, and takes
+\begin{equation}\label{eq:thm17}
+  O\Bigl(\frac{\nu n^{3}\log n}{g'}+n^{\omega+o(1)}D'^{3/2}+n^{2}D'g'\Bigr)
+\end{equation}
+additional time.  The three terms are the scans for witnesses, the choice of the
+prime and the construction of the instances.  The middle part of an instance is
+\(C_k\times\Z_p\) for a piece \(C_k\) of one part with
+\(|C_k|\le\lceil s/g'\rceil\), \(s=\lfloor\sqrt{D'}\rfloor\).  We write \(D'\)
+and \(g'\) for the parameters of the reduction and keep \(D\) for the inner
+dimension of the thin products; in the paper the two agree.
+
+With \(D'=n^{1/18}\) and \(g'=D'^{\gamma/2}\), \(\gamma=0.063\), the calls and
+the scans balance (Remark~20 of the paper), and Exact Triangle takes time
+\(n^{3-\ETpaper}\) up to a logarithmic factor (Theorem~19 of the paper), since
+\(0.063/36=\ETpaper\).
+
+\subsection{From Exact Triangle to 3SUM and APSP}
+\label{sec:known}
+
+Theorem~21 of the paper recalls two known deterministic reductions.  3SUM on
+\(n\) numbers reduces to \(n^{1/2+o(1)}\) instances of Exact Triangle on
+\(n^{1/2+o(1)}\) vertices per part \cite{CH20,VW13}.  The \(\minplus\)-product
+of \(n\times n\) matrices with entries up to \(U\) takes time
+\(O(n^{2}T(n^{1/3})\log^{2}U)\) if Exact Triangle on \(s\) vertices per part
+takes time \(T(s)\), and APSP follows with one more logarithm
+\cite{VW10,VW18,VW13}.  So if Exact Triangle is solved in time \(n^{3-\delta}\),
+then 3SUM is solved in time \(n^{a}\) for every \(a>2-\delta/2\), and the
+\(\minplus\)-product and APSP in time \(n^{a}\) for every \(a>3-\delta/3\):
+3SUM keeps half of the saving and APSP a third.  With \(\delta=\ETpaper\) this
+is Theorem~22 of the paper: 3SUM in time \(n^{\ThreeSumPaper+o(1)}\), printed
+as \(O(n^{\ThreeSumPaperStated})\), and APSP in time \(O(n^{\APSPpaper})\).

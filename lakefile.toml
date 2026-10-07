@@ -1,0 +1,33 @@
+name = "ImprovedExponents"
+version = "0.1.0"
+defaultTargets = ["ImprovedExponents", "ImprovedChallenge", "ImprovedSolution"]
+
+[leanOptions]
+pp.unicode.fun = true # pretty-prints `fun a ↦ b`
+autoImplicit = false
+relaxedAutoImplicit = false
+weak.linter.mathlibStandardSet = true
+weak.linter.style.header = false # no copyright headers in this project
+maxSynthPendingDepth = 3
+
+# The formalization of the paper (Alman, Vassilevska Williams) that this project builds on.
+[[require]]
+name = "ThreeSumApsp"
+git = "https://github.com/anthropics/formal-math"
+rev = "e1a4e6508154ea59f030480661590a9fe3018011"
+subDir = "3sum-apsp"
+
+# The proofs.
+[[lean_lib]]
+name = "ImprovedExponents"
+
+# The statement module for Comparator and the Palomar registry: the four strongest bounds, each with
+# `sorry` in place of its proof, stated with a verbatim copy of upstream's EndStatement.lean and no
+# import at all (scripts/check-endstatement.sh checks the copy).
+[[lean_lib]]
+name = "ImprovedChallenge"
+
+# The proofs of the theorems of ImprovedChallenge, imported from the library.
+[[lean_lib]]
+name = "ImprovedSolution"
+

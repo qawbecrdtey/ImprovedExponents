@@ -1,0 +1,77 @@
+\documentclass[11pt,reqno]{amsart}
+
+\input{preamble}
+\input{notation}
+\input{results}
+
+\title[Improved exponents for 3SUM and APSP]{Improved exponents for 3SUM and
+APSP\\ from triangles in sparse lopsided graphs}
+
+\author{Jihoon Hyun}
+%% \address{...}
+\email{qawbecrdtey@kaist.ac.kr}
+
+\subjclass[2020]{Primary 68Q25; Secondary 68W40, 68V20}
+
+\keywords{3SUM, all-pairs shortest paths, Exact Triangle, thin matrix
+products, Sch\"onhage's identity, formalized mathematics, Lean}
+
+\date{\today}
+
+\begin{document}
+
+\begin{abstract}
+Alman and Vassilevska Williams gave deterministic algorithms for 3SUM in time
+\(O(n^{\ThreeSumPaperStated})\) and for the \((\min,+)\)-product and APSP in
+time \(O(n^{\APSPpaper})\), through an algorithm for Exact Triangle in time
+\(n^{3-\ETpaper}\).  We analyze their algorithm again and change it in a few
+places.  An exact count of the leaves of the recursion, a host that charges the
+solver at the true size of the middle part, and encodings restricted to the
+leaves that are read raise the saving for Exact Triangle from \(\ETpaper\) to
+every number below \(\SstarLo\), so that 3SUM is solved in time
+\(O(n^{\ThreeSumOne})\); we show that the supremum of the savings of the method
+is at most \(\SstarHi\).  Following a footnote of the paper, we also solve the
+all-edges version of Exact Triangle within the same bound and reduce the
+\((\min,+)\)-product to it on the same number of vertices, so that APSP keeps
+the whole saving: the \((\min,+)\)-product and APSP are solved in time
+\(O(n^{\APSPFnOne})\), against \(O(n^{\APSPOne})\) through the standard
+reductions.  All statements are about programs of a word RAM, hold without any
+hypothesis, and are machine-checked in Lean~4 on top of the formalization of
+the original paper; the pruned encoder is written as a program and its running
+time is proved on the machine.
+\end{abstract}
+
+\maketitle
+
+\setcounter{tocdepth}{1}
+\tableofcontents
+
+\input{sections/01-introduction}
+\input{sections/02-framework}
+\input{sections/03-exact-count}
+\input{sections/04-pruned-encodings}
+\input{sections/05-middle-size}
+\input{sections/06-optimum}
+\input{sections/07-consequences}
+\input{sections/08-formalization}
+\input{sections/09-limits}
+
+\subsection*{Acknowledgments}
+
+The algorithms, the reductions and the framework of thin products are those
+of Alman and Vassilevska Williams \cite{AV}; this paper changes their analysis
+and their algorithm in a few places, and it would not exist without their work,
+nor without the Lean formalization \cite{upstream} of their paper by Anthropic,
+on which the development builds.  The proofs, the Lean development and the
+text of this paper were written by the language model Claude Fable~5.1
+(Anthropic), run as an agent in Claude Code, under the direction of the author,
+who chose the goals, decided how the results are stated and reviewed the
+outputs, and wrote no Lean by hand.  The repository
+\url{https://github.com/qawbecrdtey/ImprovedExponents} contains the development
+and this paper, and records the checks that were run
+(Section~\ref{sec:formalization}).
+
+\bibliographystyle{amsplain}
+\bibliography{references}
+
+\end{document}

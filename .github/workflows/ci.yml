@@ -1,0 +1,95 @@
+name: CI
+
+# The checks of README.md, "How to check": the source requirements of the Palomar registry, the
+# metadata, the build with no `sorry` outside the statement module, the generated certificates,
+# the Python tests, the Lean names cited by the paper, and Comparator with lean4export, the
+# independent kernel nanoda and the landrun sandbox. Actions are pinned to commits.
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  sources:
+    name: Source requirements and metadata
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b
+        with:
+          ruby-version: "3.3.12"
+      - name: Every Lean file uses the module system and has at most 10,000 lines
+        run: python3 scripts/check-lean-sources.py
+      - name: formalization.yaml has no template value and declares Apache-2.0
+        run: ruby scripts/validate-formalization.rb
+      - name: The generated certificates match their generator
+        run: python3 -m search.certs --check
+      - name: Python tests
+        run: python3 -m unittest discover -s search/tests -t .
+
+  build:
+    name: Build with Lean
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Check Lean source requirements before builds
+        run: python3 scripts/check-lean-sources.py
+      - uses: leanprover/lean-action@38fbc41a8c28c4cbaec22d7f7de508ec2e7c0dd9
+        with:
+          build: true
+          build-args: "--wfail ImprovedExponents ImprovedSolution"
+      - name: Build the statement module (its four `sorry` warnings are deliberate)
+        run: lake build ImprovedChallenge
+      - name: The copy of EndStatement.lean in the statement module is verbatim
+        run: scripts/check-endstatement.sh
+      - name: Every Lean name cited by the paper exists
+        run: python3 papers/improved-exponents/check_lean_names.py
+
+  comparator:
+    name: Statement against solution (Comparator)
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - name: Free disk space
+        # The runner's disk does not hold the toolchain, the compiled Mathlib, the tools and the
+        # fresh copy of the project with its own build; remove preinstalled SDKs this job never uses.
+        run: |
+          df -h /
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
+          sudo docker image prune --all --force >/dev/null
+          df -h /
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Check Lean source requirements before builds
+        run: python3 scripts/check-lean-sources.py
+      - uses: leanprover/lean-action@38fbc41a8c28c4cbaec22d7f7de508ec2e7c0dd9
+        with:
+          build: false
+      - name: Comparator and lean4export at v4.33.0, nanoda and landrun at upstream's CI pins
+        # The standalone tools, since the toolchain (v4.33.1) predates `lake comparator`; the run
+        # compiles the challenge and the solution in a fresh copy inside the Landlock sandbox.
+        env:
+          COMPARATOR_TOOLS: ${{ runner.temp }}/comparator-tools
+          COMPARATOR_RUNS: ${{ runner.temp }}/comparator-runs
+        run: scripts/comparator.sh all
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: always()
+        with:
+          name: comparator-log
+          path: ${{ runner.temp }}/comparator-runs/*/comparator.log
+          if-no-files-found: ignore

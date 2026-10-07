@@ -1,0 +1,72 @@
+%% Packages, typography and theorem environments.
+%% The mathematical notation lives in notation.tex, the numerals in results.tex.
+
+%% ------------------------------------------------------------------ packages
+\usepackage[T1]{fontenc}
+\usepackage[margin=1.15in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs,array}
+\usepackage{microtype}
+\usepackage{xcolor}
+\definecolor{refblue}{RGB}{20,60,140}
+\definecolor{todored}{RGB}{160,30,30}
+\usepackage[colorlinks=true,linkcolor=refblue,citecolor=refblue,
+            urlcolor=refblue,linktocpage=true,
+            bookmarksnumbered=true,bookmarksdepth=2,
+            pdftitle={Improved exponents for 3SUM and APSP from triangles in
+              sparse lopsided graphs},
+            pdfauthor={Jihoon Hyun},
+            pdfkeywords={3SUM, APSP, Exact Triangle, thin matrix products,
+              formalized mathematics}]{hyperref}
+
+%% ---------------------------------------------------------------- typography
+\allowdisplaybreaks
+%% Lean names are set in a typewriter face and do not hyphenate.
+\emergencystretch=3em
+
+%% The parts of a statement are labeled (i), (ii), ...
+\renewcommand{\theenumi}{\roman{enumi}}
+\renewcommand{\labelenumi}{\textup{(\theenumi)}}
+
+%% -------------------------------------------------------- Lean names
+%% \lean{name} typesets the name of a Lean declaration in a typewriter face.
+%% It is used every time a result is machine-checked.  The name is set by the
+%% machinery of the url package (loaded by hyperref), so underscores, primes
+%% and dots are safe and a long name may break after an underscore or a dot.
+%% Do not use it in section titles or captions.  \leanraw is the unbreakable
+%% form, \texttt{\detokenize{...}}.
+\DeclareUrlCommand\leanurl{\urlstyle{tt}%
+  \def\UrlBreaks{\do\.\do\_\do\/}\def\UrlBigBreaks{}%
+  \def\UrlSpecials{\do\'{\mbox{\textquotesingle}}}}
+\newcommand{\lean}[1]{\leanurl{#1}}
+\newcommand{\leanraw}[1]{\texttt{\detokenize{#1}}}
+
+%% -------------------------------------------------------- status markers
+%% A numbered statement with no marker in its heading is machine-checked in
+%% Lean, and its text names the declarations.  The one marker below goes into
+%% the heading of the other statements, all of which are in Section 9:
+%%   \nf    proved here on paper, not machine-checked --- never "unproved".
+%% See the Formalization paragraph of the introduction.
+\newcommand{\nf}{\textup{not formalized}}
+
+%% A visible note for the parts of the draft that are still open.
+\newcommand{\TODO}[1]{\textcolor{todored}{[\textsc{todo}: #1]}}
+
+%% ------------------------------------------------------ theorem environments
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\numberwithin{equation}{section}
+\numberwithin{table}{section}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+
+\theoremstyle{plain}
+\newtheorem{question}[theorem]{Question}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
