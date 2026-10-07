@@ -31,8 +31,9 @@ project:
     pruned encoder and the two new hosts are written as programs of the machine and their running
     times are proved on it. All Lean, Python and LaTeX was written by the language model Claude
     Fable 5.1 (Anthropic) in Claude Code, under the direction of the maintainer, who wrote no Lean
-    by hand. An accompanying paper (papers/improved-exponents/) states every result with its Lean
-    name.
+    by hand; the move to Lean v4.35.0-rc2, with the port of the included part of upstream, was made
+    by Claude Opus 5.5 (Anthropic) in the same way. An accompanying paper
+    (papers/improved-exponents/) states every result with its Lean name.
   # Required nonempty list of name strings. Palomar reserves this field for humans; the AI that
   # wrote the code is recorded under `automation`.
   authors:
@@ -83,8 +84,9 @@ sources:
       The paper whose algorithm this project analyzes again and modifies: the first truly
       subquadratic deterministic algorithm for 3SUM and the first truly subcubic one for APSP,
       through Exact Triangle and thin matrix products with Schönhage's identity. Its own bounds are
-      proved by the formalization listed under related_formalizations, which is a dependency of
-      this project; this project reuses that machine model, those programs and those proofs. The
+      proved by the formalization listed under related_formalizations, the part of which that this
+      project uses is included in it; this project reuses that machine model, those programs and
+      those proofs. The
       word RAM, the four problems and the meaning of "solved in time O(n^r)" of the submitted
       statements are upstream's rendering of the paper's Theorem 2 and Section 1, copied verbatim
       into ImprovedChallenge.lean. The authors of the paper were not involved in this project.
@@ -95,12 +97,17 @@ related_formalizations:
     relationship: builds-on
     note: >-
       Anthropic's Lean 4 formalization of the paper of Alman and Vassilevska Williams (Apache-2.0),
-      a Lake dependency of this project at the pinned commit; it is not modified. It supplies the
-      trusted file EndStatement.lean (the word RAM, Problem.SolvedInTime and the four problems; its
-      132 lines of Lean are copied verbatim into ImprovedChallenge.lean, which imports nothing, and
-      scripts/check-endstatement.sh confirms the copy), the programs of the paper, their proofs, and
-      the lemmas that this project reuses by name. Several files of ImprovedExponents/ adapt
-      upstream developments for parameters or bounds that upstream fixes; NOTICE lists them.
+      written for Lean and Mathlib v4.33.1 and not maintained. The 340 of its Lean files that this
+      project imports are included in upstream/3sum-apsp/, at the pinned commit, and ported to Lean
+      and Mathlib v4.35.0-rc2 (the registry's floor): the port changes only what no longer compiles,
+      in four files, and no statement or definition; each changed file is marked in its header and
+      listed in upstream/README.md, and scripts/check-upstream.sh confirms that every other file is
+      upstream's, byte for byte. It supplies the trusted file EndStatement.lean (the word RAM,
+      Problem.SolvedInTime and the four problems; unchanged, and its 132 lines of Lean are copied
+      verbatim into ImprovedChallenge.lean, which imports nothing, and scripts/check-endstatement.sh
+      confirms the copy), the programs of the paper, their proofs, and the lemmas that this project
+      reuses by name. Several files of ImprovedExponents/ adapt upstream developments for parameters
+      or bounds that upstream fixes; NOTICE lists them.
 
 status:
   scope: >-
@@ -159,6 +166,7 @@ automation:
     - method: autonomous
       models:
         - "Claude Fable 5.1 (Anthropic, model id claude-fable-5-1)"
+        - "Claude Opus 5.5 (Anthropic, model id claude-opus-5-5), for the move to Lean v4.35.0-rc2"
       framework: "Claude Code (Anthropic's agentic coding tool), in the terminal"
       tool_setup: >-
         Claude Fable 5.1, run as an agent in Claude Code on the maintainer's Linux workstation,
@@ -170,7 +178,12 @@ automation:
         natural language: the choice of the paper, the goals (unconditional theorems, exact real
         constants with numerals as corollaries, programs rather than hypotheses for the modified
         parts, the optimum, footnote 10 as programs), the decisions on how results are stated, and
-        the review of the outputs; the maintainer wrote no Lean by hand.
+        the review of the outputs; the maintainer wrote no Lean by hand. Claude Opus 5.5, run in the
+        same way, then moved the project to Lean v4.35.0-rc2: it included the part of upstream that
+        the library imports in upstream/3sum-apsp/, ported it (four files changed, listed in
+        upstream/README.md), renamed the deprecated names in ImprovedExponents/, and updated the
+        scripts, the continuous integration and the documents, iterating against `lake build`,
+        scripts/check-upstream.sh and `lake comparator`.
       cost:
         wall_time: "not tracked; the files of the repository were created on 2026-10-06 and 2026-10-07"
         spend_usd: not tracked
@@ -180,7 +193,9 @@ automation:
         formalization to build on; "sorry-free, with unproved parts only as explicit hypotheses",
         later "no hypotheses: write the modified parts as programs"; "general statements with exact
         real constants first, numerals as corollaries"; "reach the optimum of the method"; "carry out
-        footnote 10 as programs"; "run Comparator"; "prepare the project for the Palomar registry".
+        footnote 10 as programs"; "run Comparator"; "prepare the project for the Palomar registry";
+        "convert the project to Lean v4.35.0-rc2 and port the components of the upstream repository
+        that it needs into this repository, with correct licences".
   spend_usd: not tracked
   notes: >-
     The formalization was entirely automated in the sense that the model produced all code and text;
@@ -215,15 +230,15 @@ review:
   notes: >-
     The maintainer directed the work and reviewed its outputs; no independent human review of the
     Lean statements has taken place. Mechanical checks recorded in README.md at the submitted
-    commit: `lake build` of the
-    library with no sorry and no warning outside the statement module; Comparator
-    (leanprover/comparator and lean4export at their releases v4.33.0 built with the project's
-    toolchain v4.33.1, the independent kernel nanoda and the sandbox landrun at the revisions of
-    upstream's continuous integration; scripts/comparator.sh, log
-    scripts/comparator-run.log) accepting comparator.json;
-    scripts/check-endstatement.sh confirming that ImprovedChallenge.lean contains upstream's
-    EndStatement.lean verbatim; the generated certificates matching their generator; the Python
-    tests; and every Lean name cited in the accompanying paper existing in the sources.
+    commit: `lake build` of the library with no sorry and no warning outside the statement module;
+    the toolchain's `lake comparator` (Lean v4.35.0-rc2, with the bundled independent kernels
+    NanoDa and con-ron, in a bubblewrap sandbox, run as the registry runs it by
+    scripts/verify-comparator.sh; log scripts/comparator-run.log) accepting comparator.json;
+    scripts/check-upstream.sh confirming that upstream/3sum-apsp/ is upstream's pinned commit with
+    exactly the four listed and marked changes; scripts/check-endstatement.sh confirming that
+    ImprovedChallenge.lean contains upstream's EndStatement.lean verbatim; the generated
+    certificates matching their generator; the Python tests; and every Lean name cited in the
+    accompanying paper existing in the sources.
 
 alignment:
   # Namespace of the proof development; the compared declarations are in it too.
@@ -272,6 +287,7 @@ acknowledgements: >-
   The algorithms, the reductions and the framework of thin products are due to Josh Alman and
   Virginia Vassilevska Williams, and this project would not exist without their paper. The
   formalization builds on Anthropic's Lean 4 formalization of that paper (anthropics/formal-math,
-  3sum-apsp), whose machine model, programs and proofs it reuses, and on Mathlib. It is checked
-  with Lean's kernel and, through Comparator, with the independent kernel NanoDa. The scripts of
+  3sum-apsp), whose machine model, programs and proofs it reuses and part of which it includes,
+  and on Mathlib. It is checked with Lean's kernel and, through Comparator, with the independent
+  kernels NanoDa and con-ron. The scripts of
   the Palomar starter template are reused under its licence (NOTICE).

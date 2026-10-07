@@ -7,19 +7,25 @@ exponents for 3SUM and APSP from triangles in sparse lopsided graphs*
 Alman and Virginia Vassilevska Williams, *Truly Subquadratic 3SUM and Truly Subcubic APSP via
 Triangles in Sparse Lopsided Graphs* ([arXiv:2610.06783](https://arxiv.org/abs/2610.06783)), which
 is [`anthropics/formal-math/3sum-apsp`](https://github.com/anthropics/formal-math/tree/main/3sum-apsp)
-("upstream"): a Lake dependency of this project, pinned and never modified.
+("upstream"). The part of upstream that this project uses is included in `upstream/3sum-apsp/`, at a
+pinned commit, and ported from Lean `v4.33.1` to `v4.35.0-rc2` with four files changed
+(`upstream/README.md`).
 
 Repository: <https://github.com/qawbecrdtey/ImprovedExponents>. The repository is laid out for the
 [Palomar registry](https://palomar-registry.org/): the statement module `ImprovedChallenge.lean`,
 the solution module `ImprovedSolution.lean`, the configuration `comparator.json` and the metadata
 `formalization.yaml`.
 
-**Who did what.** Every line of Lean, Python and LaTeX in this repository was written by the
-language model Claude Fable 5.1 (Anthropic), run as an agent in Claude Code, under the direction
-of Jihoon Hyun, who chose the paper and the goals, decided how the results are stated, reviewed
-the outputs and wrote no Lean by hand. The algorithms, the reductions and the whole framework are
-due to Alman and Vassilevska Williams; see "The original work" below. `formalization.yaml` records
-the same facts in the form that Palomar reads.
+**Who did what.** Every line of Lean, Python and LaTeX in this repository outside `upstream/` was
+written by the language model Claude Fable 5.1 (Anthropic), run as an agent in Claude Code, under
+the direction of Jihoon Hyun, who chose the paper and the goals, decided how the results are
+stated, reviewed the outputs and wrote no Lean by hand. The move to Lean `v4.35.0-rc2` (the port of
+`upstream/3sum-apsp/`, the renames that it required in `ImprovedExponents/`, and the scripts and
+documents that changed with it) was made by Claude Opus 5.5 (Anthropic) in Claude Code, under the
+same direction. `upstream/3sum-apsp/` is Anthropic's formalization, apart from the four changes
+listed in `upstream/README.md`. The algorithms, the reductions and the whole framework are due to
+Alman and Vassilevska Williams; see "The original work" below. `formalization.yaml` records the
+same facts in the form that Palomar reads.
 
 ## What is proved
 
@@ -119,8 +125,9 @@ theorem apsp_allEdges_pruned : EndStatement.APSP.SolvedInTime 2.99791
 theorem has exactly the same statement on both sides (and every definition that the statements
 mention, transitively), that the proofs use no axiom beyond `propext`, `Quot.sound` and
 `Classical.choice` (so neither `sorry` nor `native_decide`), and replays the proofs in Lean's
-kernel and in the independent kernel nanoda. `scripts/check-endstatement.sh` confirms
-that the copy of `EndStatement.lean` is byte for byte the dependency's.
+kernel and in the independent kernels NanoDa and con-ron. `scripts/check-endstatement.sh` confirms
+that the copy of `EndStatement.lean` is byte for byte `upstream/3sum-apsp/EndStatement.lean`, and
+`scripts/check-upstream.sh` that this file is upstream's, unchanged.
 
 So a reader who wants to believe the four theorems has to read `ImprovedChallenge.lean` (the
 machine, the problems, what "solved in `O(n^r)` steps" means; upstream's `docs/MACHINE.md` explains
@@ -146,41 +153,34 @@ of the paper were not involved in this project and have not been asked to endors
 
 ## How to check
 
-Lean `v4.33.1` and Mathlib `v4.33.1`, as upstream (`lean-toolchain`). Every Lean file uses the
-module system.
+Lean `v4.35.0-rc2` and Mathlib `v4.35.0-rc2` (`lean-toolchain`, `lakefile.toml`); upstream was
+written for `v4.33.1`. Every Lean file uses the module system.
 
     lake exe cache get                        # Mathlib's compiled files
-    lake build                                # upstream (about ten minutes), the library, the statement
-                                              # module (four deliberate `sorry` warnings), the solution module
+    lake build                                # upstream/3sum-apsp, the library, the statement module
+                                              # (four deliberate `sorry` warnings), the solution module
     python3 scripts/check-lean-sources.py     # the registry's source requirements
     ruby scripts/validate-formalization.rb    # formalization.yaml
+    scripts/check-upstream.sh                 # upstream/3sum-apsp is upstream's commit, every change
+                                              # listed in upstream/README.md and marked (network)
     scripts/check-endstatement.sh             # the copy of EndStatement.lean is verbatim
     python3 -m unittest discover -s search/tests -t .
     python3 -m search.certs --check           # the generated certificates match the generator
     make -C papers/improved-exponents         # the paper (pdflatex, bibtex)
     make -C papers/improved-exponents check   # every Lean name cited in the paper exists
-    scripts/comparator.sh all                 # Comparator (Linux with Landlock; builds the tools
-                                              # without root, about 2 GB, then runs the check in a
-                                              # fresh copy of the sources)
+    scripts/install-bwrap.sh .cache/bwrap     # bubblewrap, if it is not installed (no root)
+    PATH="$PWD/.cache/bwrap:$PATH" scripts/verify-comparator.sh   # lake comparator, as Palomar runs it
 
 `lake build --wfail ImprovedExponents ImprovedSolution` fails on any warning; the four `sorry`
 warnings of `ImprovedChallenge` are deliberate. `.github/workflows/ci.yml` runs all of the above
 except the paper.
 
-**Comparator.** `scripts/comparator.sh` runs the standalone tool
-[Comparator](https://github.com/leanprover/comparator) with lean4export, the independent kernel
-nanoda and the sandbox landrun, in a fresh copy of the sources: Comparator and lean4export at their
-releases `v4.33.0`, built with the project's toolchain `v4.33.1`, and nanoda and landrun at the
-revisions of upstream's continuous integration. Comparator accepted `comparator.json` on 2026-10-07 ("Your solution is
-okay!", both kernels); the log is `scripts/comparator-run.log`.
-
-**The registry's toolchain floor.** Palomar accepts only toolchains `v4.35.0-rc2` or later, from
-which Comparator ships inside the toolchain as `lake comparator`, with the kernels NanoDa and
-con-ron; `scripts/verify-comparator.sh` runs that judge exactly as the registry does and is for the
-day this project moves to such a toolchain (set `lean-toolchain`, add a `[[require]]` of Mathlib at
-the same tag after the upstream requirement in `lakefile.toml`, run `lake update`, rebuild). This
-revision keeps `v4.33.1`, the version with which upstream and the original result were written;
-upstream itself is not maintained and pins `v4.33.1`.
+**Comparator.** From Lean `v4.35.0-rc2` on, [Comparator](https://github.com/leanprover/comparator)
+ships inside the toolchain as `lake comparator`, with the independent kernels NanoDa and con-ron;
+the Palomar registry, which accepts only toolchains `v4.35.0-rc2` or later, judges submissions with
+it. `scripts/verify-comparator.sh` runs it exactly as the registry does, in a bubblewrap sandbox.
+`lake comparator` accepted `comparator.json` on 2026-10-07 ("Your solution is okay!"); the log is
+`scripts/comparator-run.log`.
 
 ## Layout
 
@@ -201,12 +201,15 @@ upstream itself is not maintained and pins `v4.33.1`.
 | `ImprovedExponents/Cost8P/` | the running time of the solver with the pruned encoder |
 | `ImprovedExponents/MinPlus/` | the (min,+)-product through all-edges Exact Triangle, as mathematics |
 | `ImprovedExponents/AllEdges/` | the all-edges task and model, the all-edges host (`Host/`), the reduction from all pairs (`Pairs/`), and the chain to the (min,+)-product and APSP |
-| `scripts/` | the checks above: source requirements, metadata, the verbatim copy, `lake comparator`, bubblewrap |
+| `upstream/3sum-apsp/` | the part of upstream that the library imports, ported to `v4.35.0-rc2`; `upstream/README.md`: its source, what the port changed |
+| `scripts/` | the checks above: source requirements, metadata, the copy of upstream, the verbatim copy, `lake comparator`, bubblewrap |
 | `papers/improved-exponents/` | the accompanying paper (`main.pdf`), which states the results with their Lean names |
 | `search/` | the numeric exploration (Python, standard library only), the generator of the certificates and notes |
 
 ## License
 
-Apache License 2.0 (`LICENSE`). Parts of `ImprovedExponents/` are adapted from upstream, which is
-released under the same license; `ImprovedChallenge.lean` contains upstream's `EndStatement.lean`;
-two scripts come from the Palomar starter template. See `NOTICE`.
+Apache License 2.0 (`LICENSE`). `upstream/3sum-apsp/` is part of upstream (Copyright (c) 2026
+Anthropic, PBC), released under the same license, with its `LICENSE` and `NOTICE` beside it; the
+files that the port changed carry a notice saying so. Parts of `ImprovedExponents/` are adapted from
+upstream; `ImprovedChallenge.lean` contains upstream's `EndStatement.lean`; scripts come from the
+Palomar starter template. See `NOTICE`.

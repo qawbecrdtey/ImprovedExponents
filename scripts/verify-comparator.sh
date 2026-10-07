@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 # Judge ImprovedSolution against ImprovedChallenge the way the Palomar registry does: with the
-# `lake comparator` that ships in a toolchain of version v4.35.0-rc2 or later. THIS PROJECT IS AT
-# v4.33.1, where Comparator is a standalone tool: use scripts/comparator.sh instead. This script is
-# kept for the day the toolchain is upgraded (README.md, "The registry's toolchain floor"). It rebuilds both modules in a bubblewrap sandbox, exports them, checks that every
-# theorem named in comparator.json has the same statement on both sides and uses no axiom outside
-# the permitted list, and replays the solution through Lean's kernel and the toolchain's bundled
-# independent kernels NanoDa and con-ron. Adapted from PalomarRegistry/PalomarTemplate,
-# scripts/verify-comparator.sh.
+# `lake comparator` that ships in the project's toolchain (v4.35.0-rc2; the registry requires
+# v4.35.0-rc2 or later). It rebuilds both modules in a bubblewrap sandbox, exports them, checks
+# that every theorem named in comparator.json has the same statement on both sides and uses no
+# axiom outside the permitted list, and replays the solution through Lean's kernel and the
+# toolchain's bundled independent kernels NanoDa and con-ron. Adapted from
+# PalomarRegistry/PalomarTemplate, scripts/verify-comparator.sh.
 #
 #     scripts/verify-comparator.sh                 # from anywhere; needs bwrap on the PATH
 #     scripts/verify-comparator.sh --paranoid      # also leanchecker-paranoid, lean4lean, con-leche

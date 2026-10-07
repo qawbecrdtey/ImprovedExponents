@@ -3,7 +3,8 @@ The block from the documentation comment «Claims of the paper …» to the line
 below is the file `EndStatement.lean` of the formalization anthropics/formal-math (directory
 `3sum-apsp`, commit e1a4e6508154ea59f030480661590a9fe3018011), Copyright (c) 2026 Anthropic, PBC,
 released under the Apache License 2.0 (see `NOTICE`), copied without any change;
-`scripts/check-endstatement.sh` confirms this against the dependency. Everything after
+`scripts/check-endstatement.sh` confirms this against `upstream/3sum-apsp/EndStatement.lean`, which
+`scripts/check-upstream.sh` confirms to be upstream's file, unchanged. Everything after
 `end EndStatement` is new.
 -/
 module

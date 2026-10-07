@@ -3,9 +3,10 @@
 
 Every `\\lean{...}` in `main.tex` and `sections/*.tex` must be
 
-* a declaration of this project or of the upstream formalization (the last
-  component of a dotted name is looked up, so `Claim.Theorem_17` is found as
-  `Theorem_17`; of `Q.SolvedInTime r` only the first word is used), or
+* a declaration of this project or of the part of the upstream formalization
+  that it includes in `upstream/3sum-apsp/` (the last component of a dotted
+  name is looked up, so `Claim.Theorem_17` is found as `Theorem_17`; of
+  `Q.SolvedInTime r` only the first word is used), or
 * a file or a directory of this project or of upstream.
 
 Run from anywhere: `python3 papers/improved-exponents/check_lean_names.py`.
@@ -18,7 +19,7 @@ import sys
 HERE = pathlib.Path(__file__).resolve().parent
 ROOT = HERE.parent.parent
 OURS = ROOT / "ImprovedExponents"
-UPSTREAM = ROOT / ".lake" / "packages" / "ThreeSumApsp" / "3sum-apsp"
+UPSTREAM = ROOT / "upstream" / "3sum-apsp"
 
 DECL = re.compile(
     r"^\s*(?:@\[[^\]]*\]\s*)?(?:(?:private|protected|noncomputable|public|nonrec)\s+)*"
@@ -56,7 +57,7 @@ def is_path(name: str) -> bool:
 
 def main() -> int:
     if not UPSTREAM.is_dir():
-        print(f"upstream sources not found at {UPSTREAM}; run `lake update` first")
+        print(f"upstream sources not found at {UPSTREAM}")
         return 1
     names = declared(OURS) | declared(UPSTREAM)
     refs = cited()

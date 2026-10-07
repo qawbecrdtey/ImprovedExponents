@@ -1,13 +1,15 @@
 ImprovedExponents
 Copyright (c) 2026 Jihoon Hyun. Released under the Apache License, Version 2.0 (file LICENSE).
 
-The Lean code, the Python code and the LaTeX text of this repository were written by the
-language model Claude Fable 5.1 (Anthropic), run as an agent in Claude Code, under the direction
-of Jihoon Hyun; see README.md, "Who did what", and formalization.yaml.
+The Lean code, the Python code and the LaTeX text of this repository outside upstream/ were
+written by the language model Claude Fable 5.1 (Anthropic), run as an agent in Claude Code, under
+the direction of Jihoon Hyun; the move to Lean v4.35.0-rc2, including the changes to the files of
+upstream/3sum-apsp listed in upstream/README.md, was made by Claude Opus 5.5 (Anthropic) in Claude
+Code under the same direction. See README.md, "Who did what", and formalization.yaml.
 
-This project depends on, and in places adapts, the Lean formalization
+This project includes, and in places adapts, the Lean formalization
 
-    anthropics/formal-math, directory 3sum-apsp
+    anthropics/formal-math, directory 3sum-apsp, commit e1a4e6508154ea59f030480661590a9fe3018011
     https://github.com/anthropics/formal-math/tree/main/3sum-apsp
     Copyright (c) 2026 Anthropic, PBC. Released under the Apache License, Version 2.0.
 
@@ -15,14 +17,45 @@ of the paper "Truly Subquadratic 3SUM and Truly Subcubic APSP via Triangles in S
 Graphs" by Josh Alman and Virginia Vassilevska Williams (arXiv:2610.06783). The algorithms that
 this project analyzes and modifies are theirs.
 
+The directory upstream/3sum-apsp contains the 340 Lean files of that formalization that this
+project imports, directly or transitively, with its LICENSE and NOTICE, ported from Lean and
+Mathlib v4.33.1 to v4.35.0-rc2. Four of the files were changed by the port; each carries in its
+header the line "Modified in 2026 for ImprovedExponents (Jihoon Hyun): ported to Lean and Mathlib
+v4.35.0-rc2.", and upstream/README.md lists them with the changes. Every other file is
+upstream's, unchanged; scripts/check-upstream.sh confirms this against the commit above. The
+NOTICE of that formalization (upstream/3sum-apsp/NOTICE) reads:
+
+    ThreeSumApsp: a Lean 4 formalization of "Truly Subquadratic 3SUM and Truly Subcubic APSP via Triangles in
+    Sparse Lopsided Graphs"
+    Copyright 2026 Anthropic, PBC
+
+    This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+    The comments of the Lean files and the documents of this product quote statements and sentences of the paper named
+    above. The quoted passages are included, under the Apache License, Version 2.0, with the permission of the authors of
+    the paper.
+
+    This product depends on, but does not include, Lean 4 (https://github.com/leanprover/lean4) and
+    mathlib4 with its standard dependency set, fetched by the build tool from their public repositories at the
+    revisions pinned in lake-manifest.json: batteries, aesop, Qq, ProofWidgets4, import-graph, LeanSearchClient and
+    plausible are released under the Apache License, Version 2.0; Cli (leanprover/lean4-cli) is released under the
+    MIT License (Copyright (c) 2021 mhuisi). None of these dependencies is included in this product, apart from
+    four proofs in ThreeSumApsp/Util/PrimesInWindow.lean: the proofs of prod_middle_le and centralBinom_le are adapted
+    from that of centralBinom_le_of_no_bertrand_prime, and the proofs of concaveOn_log_add_sqrt_mul_log_sub and
+    log_add_sqrt_mul_log_le from that of Bertrand.real_main_inequality, all in the file
+    Mathlib/NumberTheory/Bertrand.lean of mathlib4 (Copyright (c) 2020 Patrick Stevens. All rights reserved. Released under
+    Apache 2.0 license. Authors: Patrick Stevens, Bolton Bailey).
+
 ImprovedChallenge.lean contains, between the documentation comment "Claims of the paper ..." and
 the line "end EndStatement", the file EndStatement.lean of that formalization, copied without any
-change (scripts/check-endstatement.sh confirms this). Its comments quote statements and sentences
-of the paper, as the upstream NOTICE records.
+change (scripts/check-endstatement.sh confirms this against upstream/3sum-apsp/EndStatement.lean,
+which is upstream's file, unchanged). Its comments quote statements and sentences of the paper, as
+the upstream NOTICE records.
 
-The following files contain proofs or definitions adapted from that formalization; the places are
-marked in the files ("adapted from upstream"). They redo an upstream development for parameters or
-bounds that upstream fixes, and follow its text closely.
+The following files of ImprovedExponents/ contain proofs or definitions adapted from that
+formalization; the places are marked in the files ("adapted from upstream"). They redo an upstream
+development for parameters or bounds that upstream fixes, and follow its text closely. The paths in
+parentheses are those of upstream (under upstream/3sum-apsp where they are included).
 
     ImprovedExponents/Pipeline/OfflineWithin.lean   (ThreeSumApsp/Programs/Sec4/ChoosingParameters/RealParameters.lean)
     ImprovedExponents/Pipeline/ThinClaim.lean       (ThreeSumApsp/Programs/Sec4/Corollary26/AllInstances.lean, Claim.lean,

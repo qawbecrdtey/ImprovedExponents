@@ -10,9 +10,14 @@ Theorems~\ref{thm:global}, \ref{thm:global-full} and~\ref{prop:shapes}; about
 
 \subsection{Relation to the upstream formalization}
 
-The formalization \cite{upstream} of the paper is a dependency of our Lean
-package, fetched by Lake at a fixed revision (\texttt{\UpstreamRev}; Lean and
-Mathlib \texttt{\LeanVersion}, as upstream).  Nothing in it is edited.  It provides the word RAM
+The part of the formalization \cite{upstream} of the paper that we use, the
+\UpstreamFiles{} files of Lean that our development imports directly or
+transitively, is included in the repository at a fixed revision
+(\texttt{\UpstreamRev}; directory \texttt{upstream/3sum-apsp}) and ported
+from Lean and Mathlib \texttt{\UpstreamVersion}, for which it was written, to
+\texttt{\LeanVersion}.  The port changes only what no longer compiles, in
+\UpstreamChanged{} of the files, and no statement or definition; every other
+file is upstream's, byte for byte.  It provides the word RAM
 and the notion \lean{Problem.SolvedInTime} (file \lean{EndStatement.lean}), a
 small programming language with a time model (\lean{lightModel}) and a compiler
 to the word RAM, the programs of the paper, and the proofs of its theorems.
@@ -198,27 +203,30 @@ certificates are checked by the kernel and not by compiled code.
 \subsection{How to check}
 
 In the root of the repository, \texttt{lake exe cache get} fetches the compiled
-Mathlib, and \texttt{lake build} checks everything: upstream, the library and
-the two modules described next.  The module \texttt{ImprovedChallenge.lean}
+Mathlib, and \texttt{lake build} checks everything: the included part of
+upstream, the library and the two modules described next; the script
+\texttt{scripts/check-upstream.sh} compares the included part with upstream's
+revision and confirms that every changed file is marked and listed.  The module \texttt{ImprovedChallenge.lean}
 states the four strongest end statements, \lean{threeSum_pruned}
 (\(\ThreeSumOne\)), \lean{exactTriangle_pruned} (\(\ETOne\)),
 \lean{minPlus_allEdges_pruned} and \lean{apsp_allEdges_pruned}
 (\(\APSPFnOne\); Theorems~\ref{thm:T1} and~\ref{thm:apsp-ae}), with
 upstream's \lean{EndStatement.lean} copied into it verbatim (the script
-\texttt{scripts/check-endstatement.sh} confirms the copy against the
-dependency) and nothing imported, each with \texttt{sorry} for its proof; the
-module \texttt{ImprovedSolution.lean} imports the proofs.  The two modules and
-the configuration \texttt{comparator.json} are in the form that the tool
-Comparator \cite{comparator} checks: that the solution proves the statements
-of the challenge, literally, that it uses only the axioms \texttt{propext},
-\texttt{Quot.sound} and \texttt{Classical.choice}, and that everything replays
-in Lean's kernel and in the independent kernel nanoda; the compilations run in
-a Landlock sandbox.  The script \texttt{scripts/comparator.sh} installs
-Comparator and lean4export at their releases v4.33.0, built with the project's
-toolchain v4.33.1, and nanoda and landrun at the revisions of upstream's
-continuous integration, and runs the check in a fresh copy of the sources.  We ran it on the final development:
-Comparator accepted the pair on \ComparatorDate{} (``Your solution is okay!'',
-both kernels; the log is \texttt{scripts/comparator-run.log}).  Every Lean
+\texttt{scripts/check-endstatement.sh} confirms the copy against the included
+file, which is upstream's) and nothing imported, each with \texttt{sorry} for
+its proof; the module \texttt{ImprovedSolution.lean} imports the proofs.  The
+two modules and the configuration \texttt{comparator.json} are in the form
+that the tool Comparator \cite{comparator} checks: that the solution proves
+the statements of the challenge, literally, that it uses only the axioms
+\texttt{propext}, \texttt{Quot.sound} and \texttt{Classical.choice}, and that
+everything replays in Lean's kernel and in independent kernels; the
+compilations run in a sandbox.  From Lean \texttt{v4.35.0-rc2} on, Comparator
+ships with the toolchain as \texttt{lake comparator}, with the independent
+kernels NanoDa and con-ron.  The script \texttt{scripts/verify-comparator.sh}
+runs it as the Palomar registry does, in a bubblewrap sandbox.  We ran it on
+the final development: \texttt{lake comparator} accepted the pair on
+\ComparatorDate{} (``Your solution is okay!'', all three kernels; the log is
+\texttt{scripts/comparator-run.log}).  Every Lean
 file of the repository uses Lean's module system, and the statement module
 imports nothing, as the Palomar registry \cite{Palomar} requires of a
 submission.

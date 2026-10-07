@@ -1,9 +1,9 @@
 name: CI
 
 # The checks of README.md, "How to check": the source requirements of the Palomar registry, the
-# metadata, the build with no `sorry` outside the statement module, the generated certificates,
-# the Python tests, the Lean names cited by the paper, and Comparator with lean4export, the
-# independent kernel nanoda and the landrun sandbox. Actions are pinned to commits.
+# metadata, the copy of upstream in upstream/3sum-apsp/, the build with no `sorry` outside the
+# statement module, the generated certificates, the Python tests, the Lean names cited by the paper,
+# and the toolchain's `lake comparator` as the registry runs it. Actions are pinned to commits.
 
 on:
   push:
@@ -33,6 +33,8 @@ jobs:
         run: python3 scripts/check-lean-sources.py
       - name: formalization.yaml has no template value and declares Apache-2.0
         run: ruby scripts/validate-formalization.rb
+      - name: upstream/3sum-apsp is upstream's commit, every change listed and marked
+        run: scripts/check-upstream.sh
       - name: The generated certificates match their generator
         run: python3 -m search.certs --check
       - name: Python tests
@@ -60,13 +62,13 @@ jobs:
         run: python3 papers/improved-exponents/check_lean_names.py
 
   comparator:
-    name: Statement against solution (Comparator)
+    name: Statement against solution (lake comparator)
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
       - name: Free disk space
-        # The runner's disk does not hold the toolchain, the compiled Mathlib, the tools and the
-        # fresh copy of the project with its own build; remove preinstalled SDKs this job never uses.
+        # The runner's disk is tight for the toolchain, the compiled Mathlib and the sandboxed build of
+        # the whole library; remove preinstalled SDKs this job never uses.
         run: |
           df -h /
           sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
@@ -80,16 +82,14 @@ jobs:
       - uses: leanprover/lean-action@38fbc41a8c28c4cbaec22d7f7de508ec2e7c0dd9
         with:
           build: false
-      - name: Comparator and lean4export at v4.33.0, nanoda and landrun at upstream's CI pins
-        # The standalone tools, since the toolchain (v4.33.1) predates `lake comparator`; the run
-        # compiles the challenge and the solution in a fresh copy inside the Landlock sandbox.
-        env:
-          COMPARATOR_TOOLS: ${{ runner.temp }}/comparator-tools
-          COMPARATOR_RUNS: ${{ runner.temp }}/comparator-runs
-        run: scripts/comparator.sh all
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        if: always()
-        with:
-          name: comparator-log
-          path: ${{ runner.temp }}/comparator-runs/*/comparator.log
-          if-no-files-found: ignore
+      - name: Install bubblewrap for lake comparator's sandbox
+        # As in the Palomar starter template: Ubuntu 24.04 restricts unprivileged user namespaces
+        # through AppArmor, which `bwrap` needs for the sandbox; the runner is disposable.
+        run: |
+          sudo apt-get update -qq >/dev/null
+          sudo apt-get install -y -qq bubblewrap >/dev/null
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+      - name: The toolchain's lake comparator, with the bundled kernels NanoDa and con-ron
+        # Rebuilds the challenge and the solution in the sandbox, compares the four statements,
+        # checks the axioms and replays the proofs, as the registry does.
+        run: scripts/verify-comparator.sh

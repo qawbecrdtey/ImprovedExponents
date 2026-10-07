@@ -190,7 +190,8 @@ their transposes, so tiles stay square.
 ## Formalization (Lean, `../ImprovedExponents/`)
 
 The improvement is formalized on top of the published formalization of the paper
-(`anthropics/formal-math/3sum-apsp`, a Lake dependency). Statements are about programs of its word RAM.
+(`anthropics/formal-math/3sum-apsp`; the part that is used is included in `../upstream/3sum-apsp/`).
+Statements are about programs of its word RAM.
 
 | Theorem (`ImprovedExponents/Statements.lean`) | 3SUM | ET | (min,+), APSP | levers |
 |---|---|---|---|---|
@@ -274,6 +275,10 @@ What changed relative to the notes above while formalizing:
 - Palomar round (2026-10-07): the project renamed `ImprovedExponents`, every Lean file ported to the module
   system, the statement module `../ImprovedChallenge.lean` made import-free by inlining upstream's
   `EndStatement.lean`, Comparator rerun with the standalone tools (`../scripts/comparator.sh`), and
-  `../formalization.yaml` and `../README.md` written for the registry. The toolchain stays at `v4.33.1` by
-  decision of the maintainer; the registry's floor is `v4.35.0-rc2`, where Comparator ships as
-  `lake comparator` (`../scripts/verify-comparator.sh` is for that day).
+  `../formalization.yaml` and `../README.md` written for the registry. The toolchain stayed at `v4.33.1`.
+- Toolchain round (2026-10-07): the registry's floor is `v4.35.0-rc2`, and upstream is pinned to `v4.33.1`
+  and not maintained, so the 340 files of upstream that the library imports were included in
+  `../upstream/3sum-apsp/` and ported to Lean and Mathlib `v4.35.0-rc2` (four files changed, listed in
+  `../upstream/README.md`; deprecation warnings off for upstream's libraries), the deprecated names
+  `if_pos`, `if_neg`, `dif_pos`, `dif_neg`, … renamed in `../ImprovedExponents/`, and Comparator run as
+  the toolchain's `lake comparator` (`../scripts/verify-comparator.sh`) instead of the standalone tools.
