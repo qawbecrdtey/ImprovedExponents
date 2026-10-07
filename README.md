@@ -130,8 +130,10 @@ that the copy of `EndStatement.lean` is byte for byte `upstream/3sum-apsp/EndSta
 `scripts/check-upstream.sh` that this file is upstream's, unchanged.
 
 So a reader who wants to believe the four theorems has to read `ImprovedChallenge.lean` (the
-machine, the problems, what "solved in `O(n^r)` steps" means; upstream's `docs/MACHINE.md` explains
-the choices) and to trust Lean's kernel and the three standard axioms. Nothing else: not Mathlib,
+machine, the problems, what "solved in `O(n^r)` steps" means; upstream's `docs/MACHINE.md`,
+[at the pinned commit](https://github.com/anthropics/formal-math/blob/e1a4e6508154ea59f030480661590a9fe3018011/3sum-apsp/docs/MACHINE.md)
+and not included here, explains the choices) and to trust Lean's kernel and the three standard
+axioms. Nothing else: not Mathlib,
 not upstream's proofs, not this library. The library proves the four theorems and much more; a
 reader of the other theorems of `ImprovedExponents/Statements.lean` must also trust the definitions
 they mention (Mathlib's reals and upstream's definitions). No file of the library contains `sorry`,
@@ -162,14 +164,16 @@ written for `v4.33.1`. Every Lean file uses the module system.
     python3 scripts/check-lean-sources.py     # the registry's source requirements
     ruby scripts/validate-formalization.rb    # formalization.yaml
     scripts/check-upstream.sh                 # upstream/3sum-apsp is upstream's commit, every change
-                                              # listed in upstream/README.md and marked (network)
+                                              # listed in upstream/README.md and marked, and exactly
+                                              # the files that the project imports (network)
     scripts/check-endstatement.sh             # the copy of EndStatement.lean is verbatim
     python3 -m unittest discover -s search/tests -t .
     python3 -m search.certs --check           # the generated certificates match the generator
     make -C papers/improved-exponents         # the paper (pdflatex, bibtex)
     make -C papers/improved-exponents check   # every Lean name cited in the paper exists
     scripts/install-bwrap.sh .cache/bwrap     # bubblewrap, if it is not installed (no root)
-    PATH="$PWD/.cache/bwrap:$PATH" scripts/verify-comparator.sh   # lake comparator, as Palomar runs it
+    PATH="$PWD/.cache/bwrap:$PATH" scripts/verify-comparator.sh   # lake comparator, as Palomar runs
+                                              # it, in a fresh copy (~/comparator-runs; about 10 GB)
 
 `lake build --wfail ImprovedExponents ImprovedSolution` fails on any warning; the four `sorry`
 warnings of `ImprovedChallenge` are deliberate. `.github/workflows/ci.yml` runs all of the above
@@ -178,9 +182,13 @@ except the paper.
 **Comparator.** From Lean `v4.35.0-rc2` on, [Comparator](https://github.com/leanprover/comparator)
 ships inside the toolchain as `lake comparator`, with the independent kernels NanoDa and con-ron;
 the Palomar registry, which accepts only toolchains `v4.35.0-rc2` or later, judges submissions with
-it. `scripts/verify-comparator.sh` runs it exactly as the registry does, in a bubblewrap sandbox.
-`lake comparator` accepted `comparator.json` on 2026-10-07 ("Your solution is okay!"); the log is
-`scripts/comparator-run.log`.
+it. `scripts/verify-comparator.sh` runs it as the registry does, in a bubblewrap sandbox, and in a
+fresh copy of the sources (the files tracked by git, with no build products, so that the challenge,
+the solution and the whole library are compiled inside the sandbox; Mathlib comes from
+`lake exe cache get`). On a host without `/run/user`, which the sandbox expects (OpenRC, some
+containers), the script adds an empty one in a further namespace, or `sudo mkdir /run/user` does.
+`lake comparator` accepted `comparator.json` on 2026-10-07 ("Your solution is okay!", with Lean's
+kernel, NanoDa and con-ron); the log is `scripts/comparator-run.log`.
 
 ## Layout
 

@@ -223,8 +223,10 @@ everything replays in Lean's kernel and in independent kernels; the
 compilations run in a sandbox.  From Lean \texttt{v4.35.0-rc2} on, Comparator
 ships with the toolchain as \texttt{lake comparator}, with the independent
 kernels NanoDa and con-ron.  The script \texttt{scripts/verify-comparator.sh}
-runs it as the Palomar registry does, in a bubblewrap sandbox.  We ran it on
-the final development: \texttt{lake comparator} accepted the pair on
+runs it as the Palomar registry does, in a bubblewrap sandbox and in a fresh
+copy of the sources without build products, so that the challenge, the
+solution and everything they import are compiled inside the sandbox.  We ran it
+on the final development: \texttt{lake comparator} accepted the pair on
 \ComparatorDate{} (``Your solution is okay!'', all three kernels; the log is
 \texttt{scripts/comparator-run.log}).  Every Lean
 file of the repository uses Lean's module system, and the statement module

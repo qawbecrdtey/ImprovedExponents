@@ -90,6 +90,15 @@ jobs:
           sudo apt-get install -y -qq bubblewrap >/dev/null
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
       - name: The toolchain's lake comparator, with the bundled kernels NanoDa and con-ron
-        # Rebuilds the challenge and the solution in the sandbox, compares the four statements,
-        # checks the axioms and replays the proofs, as the registry does.
+        # In a fresh copy of the sources (no build products, whatever the cache restored), rebuilds
+        # the challenge and the solution in the sandbox, compares the four statements, checks the
+        # axioms and replays the proofs, as the registry does.
+        env:
+          COMPARATOR_RUNS: ${{ runner.temp }}/comparator-runs
         run: scripts/verify-comparator.sh
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: always()
+        with:
+          name: comparator-log
+          path: ${{ runner.temp }}/comparator-runs/*.log
+          if-no-files-found: ignore

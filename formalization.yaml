@@ -233,7 +233,9 @@ review:
     commit: `lake build` of the library with no sorry and no warning outside the statement module;
     the toolchain's `lake comparator` (Lean v4.35.0-rc2, with the bundled independent kernels
     NanoDa and con-ron, in a bubblewrap sandbox, run as the registry runs it by
-    scripts/verify-comparator.sh; log scripts/comparator-run.log) accepting comparator.json;
+    scripts/verify-comparator.sh in a fresh copy of the sources without build products, so that
+    everything is compiled in the sandbox; log scripts/comparator-run.log) accepting
+    comparator.json;
     scripts/check-upstream.sh confirming that upstream/3sum-apsp/ is upstream's pinned commit with
     exactly the four listed and marked changes; scripts/check-endstatement.sh confirming that
     ImprovedChallenge.lean contains upstream's EndStatement.lean verbatim; the generated
